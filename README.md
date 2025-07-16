@@ -1,7 +1,6 @@
 # Archipelago Core Client for Minecraft
 
-A minimal component mod, acting as a gateway interface
-between Minecraft and one (or more) Archipelago multiworld slots.
+A minimal client between Minecraft and one (or more) Archipelago multiworld slots.
 
 | Repository                                                                      | Description                                    |
 |---------------------------------------------------------------------------------|------------------------------------------------|
