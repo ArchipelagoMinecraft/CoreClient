@@ -1,0 +1,13 @@
+{
+  "package": "io.github.archipelagominecraft.core.mixin",
+  "refmap": "archipelago_minecraft_core.refmap.json",
+  "required": true,
+  "minVersion": "0.8",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "compatibilityLevel": "JAVA_",
+  "client": [
+    "TitleScreenMixin"
+  ]
+}
