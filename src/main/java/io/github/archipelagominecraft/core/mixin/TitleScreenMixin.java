@@ -1,7 +1,7 @@
 //? if modern {
 /*package io.github.archipelagominecraft.core.mixin;
 
-import io.github.archipelagominecraft.core.ArchipelagoMinecraftCoreClient;
+import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore;
 import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +30,7 @@ public class TitleScreenMixin {
         /^baseString = baseString.replace("%MINECRAFT", "1.20.1");
         ^///?}
 
-        ArchipelagoMinecraftCoreClient.LOGGER.info(baseString);
+        ArchipelagoMinecraftClientCore.LOGGER.info(baseString);
     }
 }
 *///?}

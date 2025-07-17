@@ -1,7 +1,7 @@
 //? if fabric {
 /*package io.github.archipelagominecraft.core.loaders.fabric;
 
-import io.github.archipelagominecraft.core.ArchipelagoMinecraftCoreClient;
+import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ public class FabricEntrypoint implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Hello from FabricEntrypoint!");
-        ArchipelagoMinecraftCoreClient.initialize();
+        ArchipelagoMinecraftClientCore.initialize();
     }
 }
 *///?}

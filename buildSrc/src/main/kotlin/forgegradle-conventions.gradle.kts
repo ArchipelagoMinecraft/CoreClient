@@ -1,8 +1,12 @@
+import dev.isxander.controlify.requiredProp
+
 plugins {
     java
     id("net.minecraftforge.gradle")
 }
 
+val forgeVersion = requiredProp("deps.forge")
+val mappingsVersion = requiredProp("deps.mappings")
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 tasks.withType<JavaCompile>(){
@@ -15,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    minecraft("net.minecraftforge:forge:1.12.2-14.23.5.2860")
+    minecraft("net.minecraftforge:forge:")
 }
 
 minecraft {

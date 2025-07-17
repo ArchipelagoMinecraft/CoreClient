@@ -4,11 +4,11 @@
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 
-public class ArchipelagoMinecraftCoreClient {
+public class ArchipelagoMinecraftClientCore {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static void initialize() {
-        LOGGER.info("Hello from ArchipelagoMinecraftCoreClient!");
+        LOGGER.info("Hello from ArchipelagoMinecraftClientCore!");
     }
 }
 *///?}
