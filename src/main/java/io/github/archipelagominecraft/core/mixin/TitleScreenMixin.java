@@ -1,5 +1,5 @@
 //? if modern {
-/*package io.github.archipelagominecraft.core.mixin;
+package io.github.archipelagominecraft.core.mixin;
 
 import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -17,20 +17,20 @@ public class TitleScreenMixin {
         /// https://stonecutter.kikugie.dev/stonecutter/guide/comments
 
         //? if fabric {
-        /^baseString = baseString.replace("%LOADER%", "Fabric Loader");
-        ^///?} else if neoforge {
-        /^baseString = baseString.replace("%LOADER%", "NeoForge");
-        ^///?} else {
-        baseString = baseString.replace("%LOADER%", "Legacy Forge");
-        //?}
+        /*baseString = baseString.replace("%LOADER%", "Fabric Loader");
+        *///?} else if neoforge {
+        baseString = baseString.replace("%LOADER%", "NeoForge");
+        //?} else {
+        /*baseString = baseString.replace("%LOADER%", "Legacy Forge");
+        *///?}
 
         //? if 1.21.4 {
-        /^baseString = baseString.replace("%MINECRAFT%", "1.21.4");
-        ^///?} else if 1.20.1 {
-        /^baseString = baseString.replace("%MINECRAFT", "1.20.1");
-        ^///?}
+        baseString = baseString.replace("%MINECRAFT%", "1.21.4");
+        //?} else if 1.20.1 {
+        /*baseString = baseString.replace("%MINECRAFT", "1.20.1");
+        *///?}
 
         ArchipelagoMinecraftClientCore.LOGGER.info(baseString);
     }
 }
-*///?}
+//?}

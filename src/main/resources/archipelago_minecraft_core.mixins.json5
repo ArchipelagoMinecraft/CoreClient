@@ -6,7 +6,10 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "compatibilityLevel": "JAVA_",
+  //? if modern {
+  "hey": "no",
+  //?}
+  "compatibilityLevel": "JAVA_8",
   "client": [
     "TitleScreenMixin"
   ]

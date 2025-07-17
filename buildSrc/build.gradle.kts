@@ -9,11 +9,12 @@ repositories{
     maven("https://maven.fabricmc.net")
     maven("https://maven.neoforged.net/releases")
     maven("https://maven.minecraftforge.net/")
+    maven("https://maven.isxander.dev/releases/")
     exclusiveContent {
-        forRepository {
-            maven("https://maven.kikugie.dev/releases")
+        forRepositories(
+            maven("https://maven.kikugie.dev/releases"),
             maven("https://maven.kikugie.dev/snapshots")
-        }
+        )
         filter {
             @Suppress("UnstableApiUsage")
             includeGroupAndSubgroups("dev.kikugie")
@@ -22,8 +23,6 @@ repositories{
 }
 
 
-
-//todo use version catalogs maybe
 dependencies{
 
     fun plugin(id: String, version: String) = "$id:$id.gradle.plugin:$version"
@@ -32,6 +31,7 @@ dependencies{
     implementation(plugin("dev.kikugie.stonecutter", "0.7-beta.7"))
     implementation(plugin("fabric-loom", "1.10.5"))
     implementation(plugin("net.neoforged.moddev", "2.0.80"))
+    implementation(plugin( "org.cthing.build-constants","2.0.0"))
     implementation("net.minecraftforge.gradle","ForgeGradle", "6.0+")
-
+    implementation(plugin("dev.kikugie.j52j","2.0"))
 }

@@ -1,13 +1,10 @@
-import dev.isxander.controlify.branchProj
-import dev.isxander.controlify.mcVersion
-import dev.isxander.controlify.modstitch
-import dev.isxander.controlify.prop
-import dev.isxander.controlify.propMap
-import dev.isxander.controlify.replacementProperties
-import dev.isxander.controlify.requiredProp
-import dev.isxander.controlify.stonecutter
-import org.gradle.kotlin.dsl.register
-import java.util.Properties
+import io.archipelagominecraft.gradle.clientWorkingDirectory
+import io.archipelagominecraft.gradle.createActiveTask
+import io.archipelagominecraft.gradle.modInfo
+import io.archipelagominecraft.gradle.modstitch
+import io.archipelagominecraft.gradle.propMap
+import io.archipelagominecraft.gradle.replacementProperties
+import io.archipelagominecraft.gradle.serverWorkingDirectory
 
 plugins {
     id("common-conventions")
@@ -16,28 +13,24 @@ plugins {
 
 
 
+
+gradle.projectsEvaluated {
+    createActiveTask(tasks.named("runServer"))
+    createActiveTask(tasks.named("runClient"))
+    createActiveTask(tasks.named("build"))
+}
+
 modstitch.apply {
-    minecraftVersion = mcVersion
+    minecraftVersion = modInfo.minecraftVersion
 
     // Alternatively use stonecutter.eval if you have a lot of versions to target.
     // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
-    javaTarget = when (mcVersion) { //todo properties
-        "1.20.1" -> 17
-        "1.21.4" -> 21
-        else -> throw IllegalArgumentException("Please store the java version for ${property("deps.minecraft")} in build.gradle.kts!")
-    }
-
+    javaTarget = modInfo.javaVersion
 
     // This metadata is used to fill out the information inside
     // the metadata files found in the templates folder.
     metadata {
-        fun <K, V> MapProperty<K, V>.populate(block: MapProperty<K, V>.() -> Unit) {
-            block()
-        }
-
-        replacementProperties.populate {
-            putAll(project.replacementProperties)
-        }
+        replacementProperties.putAll(project.replacementProperties)
     }
 
     // Fabric Loom (Fabric)
@@ -53,33 +46,49 @@ modstitch.apply {
     }
 
 
+    // NeoForge
     moddevgradle {
         enable {
-            propMap("deps.neoforge") { neoForgeVersion = it }
-            propMap("deps.forge") { forgeVersion = it }
+            if (isModDevGradleRegular)
+                propMap("deps.neoforge") { neoForgeVersion = it }
+            if (isModDevGradleLegacy) {
+                propMap("deps.forge") { forgeVersion = it }
+                propMap("deps.mcp") { mcpVersion = it }
+            }
+            //if vanilla
+//            propMap("deps.neoform") {neoFormVersion = it }
         }
 
         defaultRuns()
         configureNeoforge {
             runs.all {
-                disableIdeRun()
+                if(type.get() == "client"){
+                    gameDirectory.set(project.clientWorkingDirectory)
+                }
+                else if(type.get() == "server"){
+                    programArgument("nogui")
+                    gameDirectory.set(project.serverWorkingDirectory)
+                }
             }
         }
     }
 
 
-    mixin {
-        // You do not need to specify mixins in any mods.json/toml file if this is set to
-        // true, it will automatically be generated.
-        addMixinsToModManifest = true
+    val mixinsFile = project.modInfo.mixins
+    if (!mixinsFile.isNullOrBlank()) {
+        mixin {
+            // You do not need to specify mixins in any mods.json/toml file if this is set to
+            // true, it will automatically be generated.
+            addMixinsToModManifest = true
 
-        configs.register("archipelago_minecraft_core") //todo from property
+            configs.register(mixinsFile)
 
-        // Most of the time you wont ever need loader specific mixins.
-        // If you do, simply make the mixin file and add it like so for the respective loader:
-        // if (isLoom) configs.register("examplemod-fabric")
-        // if (isModDevGradleRegular) configs.register("examplemod-neoforge")
-        // if (isModDevGradleLegacy) configs.register("examplemod-forge")
+            // Most of the time you wont ever need loader specific mixins.
+            // If you do, simply make the mixin file and add it like so for the respective loader:
+            // if (isLoom) configs.register("examplemod-fabric")
+            // if (isModDevGradleRegular) configs.register("examplemod-neoforge")
+            // if (isModDevGradleLegacy) configs.register("examplemod-forge")
+        }
     }
 }
 
@@ -91,7 +100,7 @@ modstitch.apply {
 dependencies {
     modstitch.loom {
         val modstitchModImplementation by configurations.getting
-        modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:0.112.0+1.21.4")
+        modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${modInfo.requiredDep("fabricApi")}")
     }
 }
 

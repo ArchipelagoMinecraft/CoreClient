@@ -1,5 +1,5 @@
 //? if modern {
-/*package io.github.archipelagominecraft.core;
+package io.github.archipelagominecraft.core;
 
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
@@ -11,4 +11,4 @@ public class ArchipelagoMinecraftClientCore {
         LOGGER.info("Hello from ArchipelagoMinecraftClientCore!");
     }
 }
-*///?}
+//?}

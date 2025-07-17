@@ -1,20 +1,27 @@
-import dev.isxander.controlify.branchProj
-import dev.isxander.controlify.isFabric
-import dev.isxander.controlify.isForge
-import dev.isxander.controlify.isForgeLike
-import dev.isxander.controlify.isLegacy
-import dev.isxander.controlify.isModern
-import dev.isxander.controlify.isNeoForge
-import dev.isxander.controlify.loader
-import dev.isxander.controlify.stonecutter
+import gradle.kotlin.dsl.accessors._26a65878ab300c189b82af1c4da50d69.j52j
+import io.archipelagominecraft.gradle.branchProj
+import io.archipelagominecraft.gradle.createActiveTask
+import io.archipelagominecraft.gradle.isFabric
+import io.archipelagominecraft.gradle.isForge
+import io.archipelagominecraft.gradle.isForgeLike
+import io.archipelagominecraft.gradle.isLegacy
+import io.archipelagominecraft.gradle.isModern
+import io.archipelagominecraft.gradle.isNeoForge
+import io.archipelagominecraft.gradle.loader
+import io.archipelagominecraft.gradle.modInfo
+import io.archipelagominecraft.gradle.requiredProp
+import io.archipelagominecraft.gradle.serverWorkingDirectory
+import io.archipelagominecraft.gradle.stonecutter
+import org.cthing.gradle.plugins.buildconstants.SourceAccess
 import java.util.Properties
 
 plugins{
     base
     id("me.modmuss50.mod-publish-plugin")
+    id("org.cthing.build-constants")
+    id("dev.kikugie.j52j")
     `maven-publish`
 }
-//todo add plugin to generate class with constants, like version, mod id, etc from the properties
 
 // from https://github.com/meza/Stonecraft/blob/ea2eb86e3c4a479dd2e2dfecd42f41450ddc968d/src/main/kotlin/gg/meza/stonecraft/configurations/Dependencies.kt#L75
 public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: String) {
@@ -32,12 +39,40 @@ public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: St
 
 loadSpecificDependencyVersions(project,stonecutter.current.version)
 
+tasks.generateBuildConstants{
+    classname = modInfo.packageName + "." + modInfo.name + "Constants"
+    source(files("buildSrc/**"),files("versions/dependencies/**"))
+    additionalConstants.put("MOD_ID", modInfo.id)
+    additionalConstants.put("MOD_NAME", modInfo.name)
+    additionalConstants.put("MOD_VERSION", modInfo.version)
+}
 
 
-// Stonecutter constants for mod loaders.
-// See https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants
+
+val acceptEula: TaskProvider<Task> by tasks.registering {
+    doLast {
+        serverWorkingDirectory.file("eula.txt").asFile.writeText("eula=true")
+    }
+}
+
+tasks.configureEach {
+    if (this.name == "runServer") {
+        dependsOn(acceptEula)
+    }
+}
+//
+j52j{
+    params {
+        prettyPrinting = true
+    }
+}
 
 stonecutter.apply {
+
+    filters{
+        include("resources/**.json")
+    }
+
     consts( //todo fix deprecated
         "fabric" to isFabric,
         "neoforge" to isNeoForge,
@@ -52,7 +87,15 @@ val modstitchPlatform = when(loader){
     "neoforge" -> "moddevgradle"
     "forge" -> "moddevgradle-legacy"
     "fabric" -> "loom"
-    "legacy" -> "" // to not crash
+    "legacy" -> null
     else -> throw IllegalArgumentException("Unknown loader: $loader")
 }
-project.extra["modstitch.platform"] = modstitchPlatform
+
+
+
+if(modstitchPlatform != null) {
+    project.extra["modstitch.platform"] = modstitchPlatform
+}
+
+
+
