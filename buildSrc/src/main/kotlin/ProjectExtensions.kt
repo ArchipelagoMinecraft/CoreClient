@@ -7,6 +7,8 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
 
+//taken from (end edited) : https://github.com/isXander/Controlify/blob/multiversion/dev/buildSrc/src/main/kotlin/dev/isxander/controlify/project.gradle.kts
+
 data class ModInfo(
     val minecraftVersion: String,
     val id: String,
