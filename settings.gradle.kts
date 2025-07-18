@@ -23,6 +23,23 @@ pluginManagement {
 
 plugins {
     id("dev.kikugie.stonecutter") version "0.7-beta.7"
+    id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.28"
+}
+gitHooks {
+    preCommit {
+        this@preCommit.from {
+            """
+                ./gradlew -q ensureVCSVersion >/dev/null 2>&1
+                if [ $? -ne 0 ]; then
+                    echo 'Stonecutter current version is not the VCS version!'
+                    echo 'Please run the "Reset active project" gradle task before committing.'
+                    exit 1
+                fi
+            """.trimIndent()
+        }
+    }
+
+    createHooks(true)
 }
 
 stonecutter {

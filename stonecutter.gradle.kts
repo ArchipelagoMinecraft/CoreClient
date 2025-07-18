@@ -5,6 +5,18 @@ plugins {
 }
 
 stonecutter active file("versions/current")
+
+tasks.register("ensureVCSVersion") {
+    doLast {
+        val isVcsVersion = stonecutter.vcsVersion == stonecutter.current
+        println("Current Version: ${stonecutter.current!!.version}")
+        println("VCS Version: ${stonecutter.vcsVersion.version}")
+        if(!isVcsVersion){
+            throw GradleException("Current version is not the VCS version!")
+        }
+    }
+}
+
 tasks.register("printVersions") {
     val versions = stonecutter.versions.map { it.project }
     doLast {
