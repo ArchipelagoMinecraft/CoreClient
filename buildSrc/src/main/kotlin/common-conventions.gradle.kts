@@ -51,7 +51,10 @@ tasks.generateBuildConstants{
 
 val acceptEula: TaskProvider<Task> by tasks.registering {
     doLast {
-        serverWorkingDirectory.file("eula.txt").asFile.writeText("eula=true")
+        val eulaFile = serverWorkingDirectory.file("eula.txt").asFile
+        eulaFile.parentFile.mkdirs()
+        eulaFile.createNewFile()
+        eulaFile.writeText("eula=true")
     }
 }
 
