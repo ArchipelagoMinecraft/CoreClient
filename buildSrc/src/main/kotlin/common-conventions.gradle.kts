@@ -1,6 +1,5 @@
 import gradle.kotlin.dsl.accessors._26a65878ab300c189b82af1c4da50d69.j52j
 import io.archipelagominecraft.gradle.branchProj
-import io.archipelagominecraft.gradle.createActiveTask
 import io.archipelagominecraft.gradle.isFabric
 import io.archipelagominecraft.gradle.isForge
 import io.archipelagominecraft.gradle.isForgeLike
@@ -93,7 +92,6 @@ val modstitchPlatform = when(loader){
     "legacy" -> null
     else -> throw IllegalArgumentException("Unknown loader: $loader")
 }
-
 
 
 if(modstitchPlatform != null) {

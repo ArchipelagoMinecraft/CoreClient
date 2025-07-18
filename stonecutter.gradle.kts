@@ -12,3 +12,14 @@ tasks.register("printVersions") {
         println(Json.encodeToString(versions))
     }
 }
+
+fun activeTask(name: String): TaskProvider<Task> {
+    return tasks.register(name + "Active") {
+        group = "development"
+        dependsOn(stonecutter.current!!.project + ":${name}")
+    }
+}
+
+activeTask("runServer")
+activeTask("runClient")
+activeTask("build")

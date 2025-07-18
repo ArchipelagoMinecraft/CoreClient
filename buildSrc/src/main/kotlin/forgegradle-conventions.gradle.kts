@@ -1,15 +1,13 @@
-import io.archipelagominecraft.gradle.clientWorkingDirectory
-import io.archipelagominecraft.gradle.modInfo
-import io.archipelagominecraft.gradle.replacementProperties
-import io.archipelagominecraft.gradle.requiredProp
-import io.archipelagominecraft.gradle.serverWorkingDirectory
+import io.archipelagominecraft.gradle.*
 
 plugins {
     java
     id("net.minecraftforge.gradle")
+    id("org.spongepowered.mixin")
 }
 
 val forgeVersion = requiredProp("deps.forge")
+val mixinVersionRange = requiredProp("deps.mixinRange")
 val propMappingsChannel = requiredProp("deps.mappings.channel")
 val propMappingsVersion = requiredProp("deps.mappings.version")
 
@@ -22,12 +20,28 @@ tasks.withType<JavaCompile>(){
 
 
 
+
 repositories {
     maven("https://maven.minecraftforge.net/")
+    maven("https://repo.spongepowered.org/maven")
+}
+
+mixin {
+    add(sourceSets.main.get(), "${modInfo.mixins}.refmap.json")
+    config("${modInfo.mixins}.mixins.json")
 }
 
 dependencies {
-    minecraft("net.minecraftforge:forge:${forgeVersion}")
+    minecraft("net.minecraftforge:forge:${forgeVersion}") {
+    }
+    val mixinDep = "org.spongepowered:mixin:${mixinVersionRange}"
+    annotationProcessor("${mixinDep}:processor") // Mixin processor for Forge
+    minecraftEmbed(mixinDep) {
+        exclude(group = "org.ow2.asm")
+        exclude(module = "guava")
+        exclude(module = "commons-io")
+        exclude(module = "gson")
+    }
 }
 
 val runClient = minecraft.runs.create("client")
@@ -40,6 +54,9 @@ minecraft {
         runClient.apply {
             client(true)
             workingDirectory(project.clientWorkingDirectory.asFile)
+            property("forge.logging.console.level", "debug")
+            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
+            arg("-torg.spongepowered.asm.launch.MixinTweaker")
 //            mods { //todo
 //                "${rootProject.name}" {
 //                    source(sourceSets.main.get())
@@ -82,7 +99,15 @@ sourceSets.main {
         srcDir(generateTemplates)
     }
 }
-
+tasks.jar {
+    manifest.attributes(
+        "ForceLoadAsMod" to "true",
+        "FMLCorePluginContainsFMLMod" to "true",
+        "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
+        "TweakOrder" to "0"
+    )
+    finalizedBy("reobfJar")
+}
 
 ////When Forge 1.12 loads mods from a directory that's been put on the classpath, it expects to find resources in the same directory.
 ////Default Gradle behavior puts resources in ./build/resources/main instead of ./build/classes/main/java. Let's change that.

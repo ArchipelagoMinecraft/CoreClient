@@ -133,30 +133,3 @@ fun Project.prop(property: String, required: Boolean = false, ifNull: () -> Stri
 fun Project.isPropDefined(property: String): Boolean {
     return propMap(property) { true } == true
 }
-
-// Creates a global task that will only run on the active project
-fun Project.createActiveTask(
-    taskProvider: TaskProvider<*>? = null,
-    taskName: String? = null,
-    internal: Boolean = false
-): String {
-    val taskExists = taskProvider != null || taskName!! in tasks.names
-    val task = taskProvider ?: taskName?.takeIf { taskExists }?.let { tasks.named(it) }
-    val taskName = when {
-        taskProvider != null -> taskProvider.name
-        taskName != null -> taskName
-        else -> error("Either taskProvider or taskName must be provided")
-    }
-    val activeTaskName = "${taskName}Active"
-
-    if (stonecutter.current.isActive) {
-        rootProject.tasks.register(activeTaskName) {
-            group = "development${if (internal) "/versioned" else ""}"
-
-            task?.let { dependsOn(it) }
-        }
-    }
-
-    return activeTaskName
-}
-

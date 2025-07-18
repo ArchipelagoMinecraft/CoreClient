@@ -6,11 +6,13 @@
   "injectors": {
     "defaultRequire": 1
   },
-  //? if modern {
-  "hey": "no",
-  //?}
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "TitleScreenMixin"
+    //? if legacy {
+    /*"SplashMixinLegacy",
+    *///?}
+    //? if modern {
+    "SplashMixinModern",
+    //?}
   ]
 }

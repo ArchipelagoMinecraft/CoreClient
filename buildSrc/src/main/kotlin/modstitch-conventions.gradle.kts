@@ -1,5 +1,4 @@
 import io.archipelagominecraft.gradle.clientWorkingDirectory
-import io.archipelagominecraft.gradle.createActiveTask
 import io.archipelagominecraft.gradle.modInfo
 import io.archipelagominecraft.gradle.modstitch
 import io.archipelagominecraft.gradle.propMap
@@ -11,14 +10,6 @@ plugins {
     id("dev.isxander.modstitch.base")
 }
 
-
-
-
-gradle.projectsEvaluated {
-    createActiveTask(tasks.named("runServer"))
-    createActiveTask(tasks.named("runClient"))
-    createActiveTask(tasks.named("build"))
-}
 
 modstitch.apply {
     minecraftVersion = modInfo.minecraftVersion

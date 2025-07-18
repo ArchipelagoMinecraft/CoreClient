@@ -3,6 +3,7 @@ plugins{
     kotlin("jvm") version "2.2.0"
 }
 
+@Suppress("UnstableApiUsage")
 repositories{
     mavenCentral()
     gradlePluginPortal()
@@ -12,11 +13,18 @@ repositories{
     maven("https://maven.isxander.dev/releases/")
     exclusiveContent {
         forRepositories(
+            maven("https://repo.spongepowered.org/maven")
+        )
+        filter{
+            includeGroupAndSubgroups("org.spongepowered")
+        }
+    }
+    exclusiveContent {
+        forRepositories(
             maven("https://maven.kikugie.dev/releases"),
             maven("https://maven.kikugie.dev/snapshots")
         )
         filter {
-            @Suppress("UnstableApiUsage")
             includeGroupAndSubgroups("dev.kikugie")
         }
     }
@@ -34,4 +42,5 @@ dependencies{
     implementation(plugin( "org.cthing.build-constants","2.0.0"))
     implementation("net.minecraftforge.gradle","ForgeGradle", "6.0+")
     implementation(plugin("dev.kikugie.j52j","2.0"))
+    implementation(plugin("org.spongepowered.mixin", "0.7-SNAPSHOT"))
 }
