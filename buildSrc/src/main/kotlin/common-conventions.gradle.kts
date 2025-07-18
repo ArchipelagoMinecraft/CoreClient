@@ -1,4 +1,4 @@
-import gradle.kotlin.dsl.accessors._26a65878ab300c189b82af1c4da50d69.j52j
+import dev.kikugie.j52j.J52JConverter
 import io.archipelagominecraft.gradle.branchProj
 import io.archipelagominecraft.gradle.isFabric
 import io.archipelagominecraft.gradle.isForge
@@ -68,7 +68,6 @@ j52j{
         prettyPrinting = true
     }
 }
-
 stonecutter.apply {
 
     filters{

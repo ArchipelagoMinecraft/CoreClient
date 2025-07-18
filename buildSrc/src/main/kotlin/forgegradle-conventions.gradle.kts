@@ -78,7 +78,11 @@ minecraft {
 
 }
 
-
+tasks.configureEach {
+    if (name == runClient.taskName || name == runServer.taskName) {
+        dependsOn(tasks.jar) // Or mixin config file is not found
+    }
+}
 
 val mainSourceSet = project.extensions.getByType<SourceSetContainer>()["main"]
 val templates = project.objects.sourceDirectorySet("templates", "Mod metadata resource templates")
