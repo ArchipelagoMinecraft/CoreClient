@@ -1,5 +1,5 @@
 import dev.isxander.modstitch.base.AppendMixinDataTask
-import gradle.kotlin.dsl.accessors._426eddd56d2c20596f851341a8008a63.compileOnly
+import gradle.kotlin.dsl.accessors._599ce607ee53ed38b304261ab88650f7.compileOnly
 import io.archipelagominecraft.gradle.*
 
 plugins {

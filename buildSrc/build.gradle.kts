@@ -28,6 +28,16 @@ repositories{
             includeGroupAndSubgroups("dev.kikugie")
         }
     }
+    exclusiveContent {
+        // retrofuturagradle
+        forRepositories(
+            maven("https://nexus.gtnewhorizons.com/repository/public/")
+        )
+        filter {
+            includeGroupAndSubgroups("com.gtnewhorizons")
+            includeGroupAndSubgroups("com.gtnewhorizons.retrofuturagradle")
+        }
+    }
 }
 
 
@@ -44,4 +54,5 @@ dependencies{
     implementation(plugin("org.spongepowered.mixin", "0.7-SNAPSHOT"))
     implementation(plugin("org.jetbrains.gradle.plugin.idea-ext","1.2"))
     implementation(plugin("com.gradleup.shadow","8.3.6"))
+    implementation(plugin("com.gtnewhorizons.retrofuturagradle", "1.4.6"))
 }

@@ -3,6 +3,7 @@
 
 import com.mojang.serialization.Codec;
 import io.github.archipelagominecraft.core.ArchipelagoClientConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,7 @@ public class LegacyForgeEntrypoint {
     public void preinit(FMLPreInitializationEvent preinit) {
         LOGGER.info("Hello, world from 1.12.2!");
         LOGGER.info("using lib: {}", Codec.STRING);
+        LOGGER.info("Using minecraft class {}", Minecraft.getMinecraft().gameDir);
     }
 }
 

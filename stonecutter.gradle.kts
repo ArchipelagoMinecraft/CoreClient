@@ -32,6 +32,12 @@ idea.project.settings {
         register<org.jetbrains.gradle.ext.Gradle>("Run Client") {
             this.taskNames = listOf("runClientActive")
         }
+        register<org.jetbrains.gradle.ext.Gradle>("Restore VCS Version") {
+            this.taskNames = listOf("'Reset active project'")
+        }
+        register<org.jetbrains.gradle.ext.Gradle>("Refresh Stonecutter comments") {
+            this.taskNames = listOf("'Refresh active project'")
+        }
     }
 }
 

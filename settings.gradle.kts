@@ -24,6 +24,7 @@ pluginManagement {
 plugins {
     id("dev.kikugie.stonecutter") version "0.7-beta.7"
     id("org.danilopianini.gradle-pre-commit-git-hooks") version "2.0.28"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 gitHooks {
     preCommit {

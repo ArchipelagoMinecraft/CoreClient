@@ -2,8 +2,7 @@ import io.archipelagominecraft.gradle.*
 
 plugins {
     java
-    id("net.minecraftforge.gradle")
-    id("org.spongepowered.mixin")
+    id("com.gtnewhorizons.retrofuturagradle")
     id("com.gradleup.shadow")
 }
 
@@ -25,7 +24,6 @@ configurations.implementation {
 
 
 repositories {
-    maven("https://maven.minecraftforge.net/")
     maven("https://repo.spongepowered.org/maven")
     exclusiveContent {
         forRepository {
@@ -45,60 +43,39 @@ repositories {
     }
 }
 
-mixin {
-    add(sourceSets.main.get(), "${modInfo.mixins}.refmap.json")
-    config("${modInfo.mixins}.mixins.json")
-}
-configurations.configureEach {
-    exclude("net.minecraftforge","mergetool")
-}
 
 dependencies {
-    minecraft("net.minecraftforge:forge:${forgeVersion}")
-    shade("com.mojang:datafixerupper:${dfuVersion}")
+    shade("com.mojang:datafixerupper:${dfuVersion}"){
+        isTransitive = false
+    }
 
     //mixins
     annotationProcessor("org.ow2.asm:asm-debug-all:5.2")
     annotationProcessor("com.google.guava:guava:32.1.2-jre")
     annotationProcessor("com.google.code.gson:gson:2.8.9")
 
-    implementation("zone.rong:mixinbooter:10.6") {
+    val mixins: String = modUtils.enableMixins("zone.rong:mixinbooter:10.6", "${modInfo.mixins}.refmap.json") as String
+    api(mixins) {
         isTransitive = false
     }
-    annotationProcessor("zone.rong:mixinbooter:10.6") {
+    annotationProcessor(mixins) {
         isTransitive = false
     }
 }
 
-val runClient = minecraft.runs.create("client")
-val runServer = minecraft.runs.create("server")
+
+tasks.runClient {
+    setWorkingDir(project.clientWorkingDirectory)
+}
+
+tasks.runServer{
+    setWorkingDir(project.serverWorkingDirectory)
+}
 
 minecraft {
-    mappings(propMappingsChannel, propMappingsVersion)
-
-    runs{
-        runClient.apply {
-            client(true)
-            workingDirectory(project.clientWorkingDirectory.asFile)
-            property("forge.logging.console.level", "debug")
-            property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
-            arg("-torg.spongepowered.asm.launch.MixinTweaker")
-        }
-
-        runServer.apply {
-            client(false)
-            workingDirectory(project.serverWorkingDirectory.asFile)
-            arg("nogui")
-            arg("-torg.spongepowered.asm.launch.MixinTweaker")
-        }
-    }
-
-}
-
-tasks.configureEach {
-    if (name == runClient.taskName || name == runServer.taskName) {
-        dependsOn(tasks.jar) // Or mixin config file is not found
-    }
+    mcVersion.set("1.12.2")
+    mcpMappingChannel.set(propMappingsChannel)
+    mcpMappingVersion.set(propMappingsVersion)
 }
 
 val mainSourceSet = project.extensions.getByType<SourceSetContainer>()["main"]
@@ -131,26 +108,20 @@ tasks.jar {
         "FMLCorePlugin" to "${modInfo.packageName}.loaders.legacy.LegacyForgeCorePlugin",
         "FMLCorePluginContainsFMLMod" to "true",
     )
-    finalizedBy("reobfJar")
 }
 
 
-val reobfShadowJar = reobf.create("shadowJar")
 tasks.shadowJar {
     archiveClassifier.set("")
     configurations = listOf(shade)
     relocate("com.mojang", "$relocated.com.mojang")
-    finalizedBy(reobfShadowJar)
 }
-tasks.assemble {
+tasks.reobfJar{
+    inputJar.set(tasks.shadowJar.flatMap { it.archiveFile })
     dependsOn(tasks.shadowJar)
 }
 
-
-////When Forge 1.12 loads mods from a directory that's been put on the classpath, it expects to find resources in the same directory.
-////Default Gradle behavior puts resources in ./build/resources/main instead of ./build/classes/main/java. Let's change that.
-sourceSets.all {
-    this.output.setResourcesDir(this.output.classesDirs.getFiles().first())
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
 }
-
 
