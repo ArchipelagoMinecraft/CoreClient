@@ -49,6 +49,9 @@ mixin {
     add(sourceSets.main.get(), "${modInfo.mixins}.refmap.json")
     config("${modInfo.mixins}.mixins.json")
 }
+configurations.configureEach {
+    exclude("net.minecraftforge","mergetool")
+}
 
 dependencies {
     minecraft("net.minecraftforge:forge:${forgeVersion}")
