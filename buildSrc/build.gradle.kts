@@ -41,7 +41,6 @@ dependencies{
     implementation(plugin("net.neoforged.moddev", "2.0.80"))
     implementation(plugin( "org.cthing.build-constants","2.0.0"))
     implementation("net.minecraftforge.gradle","ForgeGradle", "6.0+")
-    implementation(plugin("dev.kikugie.j52j","2.0"))
     implementation(plugin("org.spongepowered.mixin", "0.7-SNAPSHOT"))
     implementation(plugin("org.jetbrains.gradle.plugin.idea-ext","1.2"))
     implementation(plugin("com.gradleup.shadow","8.3.6"))

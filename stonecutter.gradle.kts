@@ -1,7 +1,10 @@
 import kotlinx.serialization.json.Json
+import org.jetbrains.gradle.ext.runConfigurations
+import org.jetbrains.gradle.ext.settings
 
 plugins {
     id("dev.kikugie.stonecutter")
+    id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
 stonecutter active file("versions/current")
@@ -13,6 +16,21 @@ tasks.register("ensureVCSVersion") {
         println("VCS Version: ${stonecutter.vcsVersion.version}")
         if(!isVcsVersion){
             throw GradleException("Current version is not the VCS version!")
+        }
+    }
+}
+
+
+idea.project.settings {
+    runConfigurations {
+        register<org.jetbrains.gradle.ext.Gradle>("Build") {
+            this.taskNames = listOf("buildActive")
+        }
+        register<org.jetbrains.gradle.ext.Gradle>("Run Server") {
+            this.taskNames = listOf("runServerActive")
+        }
+        register<org.jetbrains.gradle.ext.Gradle>("Run Client") {
+            this.taskNames = listOf("runClientActive")
         }
     }
 }

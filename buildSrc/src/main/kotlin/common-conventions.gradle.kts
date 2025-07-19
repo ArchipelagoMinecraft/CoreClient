@@ -1,18 +1,7 @@
-import dev.kikugie.j52j.J52JConverter
 import io.archipelagominecraft.gradle.requiredProp
 import io.archipelagominecraft.gradle.*
 import org.cthing.gradle.plugins.buildconstants.SourceAccess
 import java.util.Properties
-
-plugins{
-    base
-    idea
-    id("org.jetbrains.gradle.plugin.idea-ext")
-    id("me.modmuss50.mod-publish-plugin")
-    id("org.cthing.build-constants")
-    id("dev.kikugie.j52j")
-    `maven-publish`
-}
 
 // from https://github.com/meza/Stonecraft/blob/ea2eb86e3c4a479dd2e2dfecd42f41450ddc968d/src/main/kotlin/gg/meza/stonecraft/configurations/Dependencies.kt#L75
 public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: String) {
@@ -29,36 +18,6 @@ public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: St
 }
 
 loadSpecificDependencyVersions(project,stonecutter.current.version)
-
-tasks.generateBuildConstants{
-    classname.set(modInfo.packageName + "." + modInfo.name + "Constants")
-    source(files("buildSrc/**"),files("versions/dependencies/**"))
-    additionalConstants.put("MOD_ID", modInfo.id)
-    additionalConstants.put("MOD_NAME", modInfo.name)
-    additionalConstants.put("MOD_VERSION", modInfo.version)
-    additionalConstants.put("MOD_MIXINS_FILE",modInfo.mixins ?: "")
-}
-
-
-
-val acceptEula: TaskProvider<Task> by tasks.registering {
-    doLast {
-        val eulaFile = serverWorkingDirectory.file("eula.txt").asFile
-        eulaFile.parentFile.mkdirs()
-        eulaFile.createNewFile()
-        eulaFile.writeText("eula=true")
-    }
-}
-
-tasks.configureEach {
-    if (this.name == "runServer") {
-        dependsOn(acceptEula)
-    }
-}
-
-
-
-
 
 val modstitchPlatform = when(loader){
     "neoforge" -> "moddevgradle"

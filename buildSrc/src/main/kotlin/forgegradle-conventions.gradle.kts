@@ -1,4 +1,3 @@
-import gradle.kotlin.dsl.accessors._bd0d4aa72f48ba97d971a13e27da89ff.jar
 import io.archipelagominecraft.gradle.*
 
 plugins {

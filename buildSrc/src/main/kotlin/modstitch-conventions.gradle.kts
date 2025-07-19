@@ -1,7 +1,9 @@
 import dev.isxander.modstitch.base.AppendMixinDataTask
+import gradle.kotlin.dsl.accessors._426eddd56d2c20596f851341a8008a63.compileOnly
 import io.archipelagominecraft.gradle.*
 
 plugins {
+    base
     id("common-conventions")
     id("dev.isxander.modstitch.base")
 }
@@ -10,8 +12,6 @@ plugins {
 modstitch.apply {
     minecraftVersion.set(modInfo.minecraftVersion)
 
-    // Alternatively use stonecutter.eval if you have a lot of versions to target.
-    // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
     javaTarget.set(modInfo.javaVersion)
 
     // This metadata is used to fill out the information inside
@@ -60,6 +60,7 @@ modstitch.apply {
                     programArgument("nogui")
                     gameDirectory.set(project.serverWorkingDirectory)
                 }
+                disableIdeRun()
             }
         }
     }
@@ -100,8 +101,7 @@ if (loader == "vanilla") {
 
 
 dependencies {
-
-modstitch.loom {
+    modstitch.loom {
         val modstitchModImplementation by configurations.getting
         modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${modInfo.requiredDep("fabricApi")}")
     }
