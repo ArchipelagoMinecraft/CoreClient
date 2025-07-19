@@ -1,13 +1,15 @@
+import gradle.kotlin.dsl.accessors._bd0d4aa72f48ba97d971a13e27da89ff.jar
 import io.archipelagominecraft.gradle.*
 
 plugins {
     java
     id("net.minecraftforge.gradle")
     id("org.spongepowered.mixin")
+    id("com.gradleup.shadow")
 }
 
 val forgeVersion = requiredProp("deps.forge")
-val mixinVersionRange = requiredProp("deps.mixinRange")
+val dfuVersion = requiredProp("deps.datafixerupper")
 val propMappingsChannel = requiredProp("deps.mappings.channel")
 val propMappingsVersion = requiredProp("deps.mappings.version")
 
@@ -17,13 +19,31 @@ tasks.withType<JavaCompile>(){
     targetCompatibility = modInfo.javaVersion.toString()
 }
 
-
-
+val shade by configurations.creating
+configurations.implementation {
+    extendsFrom(shade)
+}
 
 
 repositories {
     maven("https://maven.minecraftforge.net/")
     maven("https://repo.spongepowered.org/maven")
+    exclusiveContent {
+        forRepository {
+            maven("https://maven.cleanroommc.com")
+        }
+        filter {
+            includeModule("zone.rong", "mixinbooter")
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven("https://libraries.minecraft.net")
+        }
+        filter {
+            includeModule("com.mojang", "datafixerupper")
+        }
+    }
 }
 
 mixin {
@@ -32,15 +52,19 @@ mixin {
 }
 
 dependencies {
-    minecraft("net.minecraftforge:forge:${forgeVersion}") {
+    minecraft("net.minecraftforge:forge:${forgeVersion}")
+    shade("com.mojang:datafixerupper:${dfuVersion}")
+
+    //mixins
+    annotationProcessor("org.ow2.asm:asm-debug-all:5.2")
+    annotationProcessor("com.google.guava:guava:32.1.2-jre")
+    annotationProcessor("com.google.code.gson:gson:2.8.9")
+
+    implementation("zone.rong:mixinbooter:10.6") {
+        isTransitive = false
     }
-    val mixinDep = "org.spongepowered:mixin:${mixinVersionRange}"
-    annotationProcessor("${mixinDep}:processor") // Mixin processor for Forge
-    minecraftEmbed(mixinDep) {
-        exclude(group = "org.ow2.asm")
-        exclude(module = "guava")
-        exclude(module = "commons-io")
-        exclude(module = "gson")
+    annotationProcessor("zone.rong:mixinbooter:10.6") {
+        isTransitive = false
     }
 }
 
@@ -57,22 +81,13 @@ minecraft {
             property("forge.logging.console.level", "debug")
             property("forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP")
             arg("-torg.spongepowered.asm.launch.MixinTweaker")
-//            mods { //todo
-//                "${rootProject.name}" {
-//                    source(sourceSets.main.get())
-//                }
-//            }
         }
 
         runServer.apply {
             client(false)
             workingDirectory(project.serverWorkingDirectory.asFile)
             arg("nogui")
-//            mods { //todo
-//                "${rootProject.name}" {
-//                    source(sourceSets.main.get())
-//                }
-//            }
+            arg("-torg.spongepowered.asm.launch.MixinTweaker")
         }
     }
 
@@ -98,20 +113,37 @@ val generateTemplates by tasks.registering(ProcessResources::class) {
         expand(project.replacementProperties)
     }
 }
+
+val relocated = modInfo.packageName + ".relocated"
+
 sourceSets.main {
     resources {
         srcDir(generateTemplates)
     }
 }
 tasks.jar {
+    archiveClassifier.set("slim")
+
     manifest.attributes(
         "ForceLoadAsMod" to "true",
+        "FMLCorePlugin" to "${modInfo.packageName}.loaders.legacy.LegacyForgeCorePlugin",
         "FMLCorePluginContainsFMLMod" to "true",
-        "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
-        "TweakOrder" to "0"
     )
     finalizedBy("reobfJar")
 }
+
+
+val reobfShadowJar = reobf.create("shadowJar")
+tasks.shadowJar {
+    archiveClassifier.set("")
+    configurations = listOf(shade)
+    relocate("com.mojang", "$relocated.com.mojang")
+    finalizedBy(reobfShadowJar)
+}
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
+}
+
 
 ////When Forge 1.12 loads mods from a directory that's been put on the classpath, it expects to find resources in the same directory.
 ////Default Gradle behavior puts resources in ./build/resources/main instead of ./build/classes/main/java. Let's change that.

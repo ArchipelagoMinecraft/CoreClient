@@ -4,7 +4,6 @@ import dev.isxander.modstitch.base.extensions.ModstitchExtension
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
 
 //taken from (end edited) : https://github.com/isXander/Controlify/blob/multiversion/dev/buildSrc/src/main/kotlin/dev/isxander/controlify/project.gradle.kts
@@ -22,15 +21,10 @@ data class ModInfo(
     val issueTracker: String?,
     val packFormat: String?,
     val mixins: String?,
-    private val javaVersionInput: Int?,
+    val javaVersion: Int,
     private val project: Project
 ) {
-    val javaVersion = javaVersionInput ?: when {
-        project.stonecutter.eval(minecraftVersion, "<1.20") -> 8
-        project.stonecutter.eval(minecraftVersion,">=1.20.1") -> 17
-        project.stonecutter.eval(minecraftVersion,">=1.21.4") -> 21
-        else -> error("Please store the java version for $minecraftVersion in build.gradle.kts!")
-    }
+
     fun requiredDep(name: String) = project.requiredProp("deps.$name")
 }
 
@@ -40,7 +34,7 @@ val Project.modInfo: ModInfo
         id = requiredProp("mod.id"),
         name = requiredProp("mod.name"),
         packageName = requiredProp("mod.package"),
-        javaVersionInput = prop("deps.java")?.toIntOrNull(),
+        javaVersion = requiredProp("deps.java").toInt(),
         version = requiredProp("mod.version"),
         packFormat = prop("mod.pack_format"),
         mixins = prop("mod.mixins"),

@@ -1,21 +1,13 @@
 import dev.kikugie.j52j.J52JConverter
-import io.archipelagominecraft.gradle.branchProj
-import io.archipelagominecraft.gradle.isFabric
-import io.archipelagominecraft.gradle.isForge
-import io.archipelagominecraft.gradle.isForgeLike
-import io.archipelagominecraft.gradle.isLegacy
-import io.archipelagominecraft.gradle.isModern
-import io.archipelagominecraft.gradle.isNeoForge
-import io.archipelagominecraft.gradle.loader
-import io.archipelagominecraft.gradle.modInfo
 import io.archipelagominecraft.gradle.requiredProp
-import io.archipelagominecraft.gradle.serverWorkingDirectory
-import io.archipelagominecraft.gradle.stonecutter
+import io.archipelagominecraft.gradle.*
 import org.cthing.gradle.plugins.buildconstants.SourceAccess
 import java.util.Properties
 
 plugins{
     base
+    idea
+    id("org.jetbrains.gradle.plugin.idea-ext")
     id("me.modmuss50.mod-publish-plugin")
     id("org.cthing.build-constants")
     id("dev.kikugie.j52j")
@@ -39,11 +31,12 @@ public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: St
 loadSpecificDependencyVersions(project,stonecutter.current.version)
 
 tasks.generateBuildConstants{
-    classname = modInfo.packageName + "." + modInfo.name + "Constants"
+    classname.set(modInfo.packageName + "." + modInfo.name + "Constants")
     source(files("buildSrc/**"),files("versions/dependencies/**"))
     additionalConstants.put("MOD_ID", modInfo.id)
     additionalConstants.put("MOD_NAME", modInfo.name)
     additionalConstants.put("MOD_VERSION", modInfo.version)
+    additionalConstants.put("MOD_MIXINS_FILE",modInfo.mixins ?: "")
 }
 
 
@@ -62,32 +55,16 @@ tasks.configureEach {
         dependsOn(acceptEula)
     }
 }
-//
-j52j{
-    params {
-        prettyPrinting = true
-    }
-}
-stonecutter.apply {
 
-    filters{
-        include("resources/**.json")
-    }
 
-    consts( //todo fix deprecated
-        "fabric" to isFabric,
-        "neoforge" to isNeoForge,
-        "forge" to isForge,
-        "forgeLike" to isForgeLike,
-        "legacy" to isLegacy,
-        "modern" to isModern
-    )
-}
+
+
 
 val modstitchPlatform = when(loader){
     "neoforge" -> "moddevgradle"
     "forge" -> "moddevgradle-legacy"
     "fabric" -> "loom"
+    "vanilla" -> "moddevgradle"
     "legacy" -> null
     else -> throw IllegalArgumentException("Unknown loader: $loader")
 }

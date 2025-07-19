@@ -1,9 +1,5 @@
-import io.archipelagominecraft.gradle.clientWorkingDirectory
-import io.archipelagominecraft.gradle.modInfo
-import io.archipelagominecraft.gradle.modstitch
-import io.archipelagominecraft.gradle.propMap
-import io.archipelagominecraft.gradle.replacementProperties
-import io.archipelagominecraft.gradle.serverWorkingDirectory
+import dev.isxander.modstitch.base.AppendMixinDataTask
+import io.archipelagominecraft.gradle.*
 
 plugins {
     id("common-conventions")
@@ -12,11 +8,11 @@ plugins {
 
 
 modstitch.apply {
-    minecraftVersion = modInfo.minecraftVersion
+    minecraftVersion.set(modInfo.minecraftVersion)
 
     // Alternatively use stonecutter.eval if you have a lot of versions to target.
     // https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions
-    javaTarget = modInfo.javaVersion
+    javaTarget.set(modInfo.javaVersion)
 
     // This metadata is used to fill out the information inside
     // the metadata files found in the templates folder.
@@ -28,7 +24,7 @@ modstitch.apply {
     loom {
         // It's not recommended to store the Fabric Loader version in properties.
         // Make sure its up to date.
-        fabricLoaderVersion = "0.16.10"
+        fabricLoaderVersion.set("0.16.10")
 
         // Configure loom like normal in this block.
         configureLoom {
@@ -40,11 +36,15 @@ modstitch.apply {
     // NeoForge
     moddevgradle {
         enable {
-            if (isModDevGradleRegular)
-                propMap("deps.neoforge") { neoForgeVersion = it }
-            if (isModDevGradleLegacy) {
-                propMap("deps.forge") { forgeVersion = it }
-                propMap("deps.mcp") { mcpVersion = it }
+            if (loader == "vanilla") {
+                propMap("deps.neoform") { neoFormVersion = it }
+            } else {
+                if (isModDevGradleRegular)
+                    propMap("deps.neoforge") { neoForgeVersion = it }
+                if (isModDevGradleLegacy) {
+                    propMap("deps.forge") { forgeVersion = it }
+                    propMap("deps.mcp") { mcpVersion = it }
+                }
             }
             //if vanilla
 //            propMap("deps.neoform") {neoFormVersion = it }
@@ -70,7 +70,7 @@ modstitch.apply {
         mixin {
             // You do not need to specify mixins in any mods.json/toml file if this is set to
             // true, it will automatically be generated.
-            addMixinsToModManifest = true
+            addMixinsToModManifest.set(true)
 
             configs.register(mixinsFile)
 
@@ -88,8 +88,20 @@ modstitch.apply {
 // Wondering where the "repositories" block is? Go to "stonecutter.gradle.kts"
 // If you want to create proxy configurations for more source sets, such as client source sets,
 // use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
+
+if (loader == "vanilla") {
+    tasks.withType<AppendMixinDataTask>(){
+        enabled = false
+    }
+    dependencies {
+        compileOnly("org.spongepowered:mixin:${modInfo.requiredDep("vanilla.mixin")}")
+    }
+}
+
+
 dependencies {
-    modstitch.loom {
+
+modstitch.loom {
         val modstitchModImplementation by configurations.getting
         modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${modInfo.requiredDep("fabricApi")}")
     }

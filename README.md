@@ -15,4 +15,6 @@ See the [KubeJS Archipelago](https://github.com/ArchipelagoMinecraft/KubeJSArchi
 
 ## Maven Dependency
 
+Requires MixinBooter(https://github.com/CleanroomMC/MixinBooter) for 1.12.2
+
 TODO

@@ -56,7 +56,7 @@ stonecutter {
 
         // Configure your targets here!
         mc("1.12.2", loaders = listOf("legacy"))
-        mc("1.21.4", loaders = listOf("fabric","neoforge"))
+        mc("1.21.4", loaders = listOf("fabric","neoforge","vanilla"))
 //        mc("1.20.1", loaders = listOf("forge"))
 
         // This is the default target.
