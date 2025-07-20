@@ -65,15 +65,11 @@ val Project.clientWorkingDirectory
     get() = layout.projectDirectory.dir(prop("run.client_working_directory") ?: "run")
 
 val Project.isForge: Boolean
-    get() = loader == "forge"
+    get() = loader == "forge" || loader == "legacy" //todo more generic
 val Project.isNeoForge: Boolean
     get() = loader == "neoforge"
 val Project.isFabric: Boolean
     get() = loader == "fabric"
-val Project.isLegacy: Boolean
-    get() = loader == "legacy"
-val Project.isModern: Boolean
-    get() = loader != "legacy"
 val Project.isForgeLike: Boolean
     get() = isForge || isNeoForge
 
@@ -91,7 +87,7 @@ val Project.replacementProperties: Map<String, String>
         put("mod_authors", authors)
         put("mod_authors_json_list", Json.encodeToString(authors.split(",")))
         put("mod_issue_tracker", requiredProp("mod.issue_tracker"))
-        val handler = if (isModern) {
+        val handler = if (stonecutter.eval(stonecutter.current.version,">=1.12.2")) {
             { it: String ->
                 requiredProp(it)
             }

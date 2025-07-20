@@ -1,5 +1,4 @@
 import dev.isxander.modstitch.base.AppendMixinDataTask
-import gradle.kotlin.dsl.accessors._599ce607ee53ed38b304261ab88650f7.compileOnly
 import io.archipelagominecraft.gradle.*
 
 plugins {
@@ -7,6 +6,7 @@ plugins {
     id("common-conventions")
     id("dev.isxander.modstitch.base")
 }
+
 
 
 modstitch.apply {
@@ -61,6 +61,7 @@ modstitch.apply {
                     gameDirectory.set(project.serverWorkingDirectory)
                 }
                 disableIdeRun()
+                additionalRuntimeClasspathConfiguration.extendsFrom(configurations.runtimeClasspath.get())
             }
         }
     }
@@ -95,6 +96,7 @@ if (loader == "vanilla") {
         enabled = false
     }
     dependencies {
+        val compileOnly by configurations.existing
         compileOnly("org.spongepowered:mixin:${modInfo.requiredDep("vanilla.mixin")}")
     }
 }

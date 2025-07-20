@@ -1,9 +1,10 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.archipelagominecraft.gradle.*
 
 plugins {
     java
+    id("common-conventions")
     id("com.gtnewhorizons.retrofuturagradle")
-    id("com.gradleup.shadow")
 }
 
 val forgeVersion = requiredProp("deps.forge")
@@ -17,10 +18,7 @@ tasks.withType<JavaCompile>(){
     targetCompatibility = modInfo.javaVersion.toString()
 }
 
-val shade by configurations.creating
-configurations.implementation {
-    extendsFrom(shade)
-}
+
 
 
 repositories {
@@ -45,6 +43,7 @@ repositories {
 
 
 dependencies {
+    val shade by configurations.existing
     shade("com.mojang:datafixerupper:${dfuVersion}"){
         isTransitive = false
     }
@@ -101,8 +100,6 @@ sourceSets.main {
     }
 }
 tasks.jar {
-    archiveClassifier.set("slim")
-
     manifest.attributes(
         "ForceLoadAsMod" to "true",
         "FMLCorePlugin" to "${modInfo.packageName}.loaders.legacy.LegacyForgeCorePlugin",
@@ -110,18 +107,11 @@ tasks.jar {
     )
 }
 
-
 tasks.shadowJar {
-    archiveClassifier.set("")
-    configurations = listOf(shade)
     relocate("com.mojang", "$relocated.com.mojang")
 }
-tasks.reobfJar{
+tasks.reobfJar {
     inputJar.set(tasks.shadowJar.flatMap { it.archiveFile })
-    dependsOn(tasks.shadowJar)
-}
-
-tasks.assemble {
     dependsOn(tasks.shadowJar)
 }
 

@@ -1,7 +1,4 @@
 import io.archipelagominecraft.gradle.stonecutter
-plugins{
-    id("common-conventions")
-}
 
 val is_modern = stonecutter.eval(stonecutter.current.version, ">1.12.2")
 if(is_modern)

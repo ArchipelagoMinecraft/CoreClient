@@ -1,4 +1,5 @@
 import io.archipelagominecraft.gradle.*
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins{
     id("conditional-modstitch")
@@ -8,6 +9,9 @@ plugins{
     `maven-publish`
 }
 
+tasks.withType<KotlinCompile> {
+    dependsOn(tasks.generateBuildConstants)
+}
 
 j52j{
     params {
@@ -33,8 +37,6 @@ stonecutter.apply {
         "neoforge" to isNeoForge,
         "forge" to isForge,
         "forgeLike" to isForgeLike,
-        "legacy" to isLegacy,
-        "modern" to isModern
     )
 }
 

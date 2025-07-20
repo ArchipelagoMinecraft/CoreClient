@@ -1,7 +1,12 @@
-import io.archipelagominecraft.gradle.requiredProp
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.archipelagominecraft.gradle.*
-import org.cthing.gradle.plugins.buildconstants.SourceAccess
+import org.gradle.kotlin.dsl.invoke
 import java.util.Properties
+
+plugins {
+    id("com.gradleup.shadow")
+    id("org.jetbrains.kotlin.jvm")
+}
 
 // from https://github.com/meza/Stonecraft/blob/ea2eb86e3c4a479dd2e2dfecd42f41450ddc968d/src/main/kotlin/gg/meza/stonecraft/configurations/Dependencies.kt#L75
 public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: String) {
@@ -33,5 +38,45 @@ if(modstitchPlatform != null) {
     project.extra["modstitch.platform"] = modstitchPlatform
 }
 
+
+
+val implementation by configurations.existing
+
+val shade by configurations.creating
+implementation {
+    extendsFrom(shade)
+}
+tasks.existing(Jar::class){
+    archiveClassifier.set("slim")
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    archiveClassifier.set("")
+    configurations = listOf(shade)
+}
+
+tasks.assemble {
+    dependsOn(tasks.shadowJar)
+}
+
+val runtimeClassPath by configurations.registering
+
+kotlin {
+    @Suppress("UnstableApiUsage")
+    jvmToolchain(modInfo.javaVersion)
+    compilerOptions{
+        freeCompilerArgs.add("-Xnested-type-aliases")
+    }
+}
+dependencies{
+    val kotlinStdlib = kotlin("stdlib-jdk8")
+    shade(kotlinStdlib)
+    runtimeClassPath(kotlinStdlib)
+}
+tasks.shadowJar {
+    relocate("kotlin", "${modInfo.packageName}.relocated.kotlin")
+    relocate("org.jetbrains", "${modInfo.packageName}.relocated.jetbrains")
+    relocate("intellij", "${modInfo.packageName}.relocated.intellij")
+}
 
 

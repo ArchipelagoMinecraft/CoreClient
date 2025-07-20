@@ -53,6 +53,7 @@ dependencies{
     implementation("net.minecraftforge.gradle","ForgeGradle", "6.0+")
     implementation(plugin("org.spongepowered.mixin", "0.7-SNAPSHOT"))
     implementation(plugin("org.jetbrains.gradle.plugin.idea-ext","1.2"))
+    implementation(plugin("org.jetbrains.kotlin.jvm", "2.2.0"))
     implementation(plugin("com.gradleup.shadow","8.3.6"))
     implementation(plugin("com.gtnewhorizons.retrofuturagradle", "1.4.6"))
 }

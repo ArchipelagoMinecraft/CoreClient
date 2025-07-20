@@ -1,4 +1,4 @@
-//? if legacy {
+//? if <=1.12.2 {
 /*package io.github.archipelagominecraft.core.loaders.legacy;
 
 import com.google.common.collect.ImmutableList;
