@@ -1,5 +1,4 @@
-package io.github.archipelagominecraft.core.compat
-
+package io.github.archipelagominecraft.core.vanilla.compat
 
 typealias ServerPlayer =
 //? if <=1.12.2 {

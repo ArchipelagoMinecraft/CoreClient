@@ -24,7 +24,7 @@ modstitch.apply {
     loom {
         // It's not recommended to store the Fabric Loader version in properties.
         // Make sure its up to date.
-        fabricLoaderVersion.set("0.16.10")
+        fabricLoaderVersion.set(requiredProp("deps.fabricLoader"))
 
         // Configure loom like normal in this block.
         configureLoom {

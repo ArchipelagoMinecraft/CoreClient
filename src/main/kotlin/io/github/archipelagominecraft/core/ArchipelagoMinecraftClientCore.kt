@@ -7,7 +7,7 @@ import io.github.archipelagominecraft.core.vanilla.ArchipelagoMinecraftVanilla
 
 object ArchipelagoMinecraftClientCore {
     @JvmField
-    val LOGGER: Logger = LogManager.getLogger(ArchipelagoClientConstants.MOD_NAME)
+    internal val LOGGER: Logger = LogManager.getLogger(ArchipelagoClientConstants.MOD_NAME)
 
     private val LOCATION_TYPES: MutableMap<String, ArchipelagoLocationType<*, *>> =
         HashMap()
@@ -19,23 +19,16 @@ object ArchipelagoMinecraftClientCore {
     }
 
     @JvmStatic
-    fun initialize() {
+    internal fun initialize() {
         LOGGER.info("Hello from ArchipelagoMinecraftClientCore!")
         ArchipelagoMinecraftVanilla.initialize()
     }
 
     @JvmStatic
-    fun afterRegistration() {
+    internal fun afterRegistration() {
         LOGGER.info("All location types have been registered. Total: " + LOCATION_TYPES.size)
         LOCATION_TYPES.forEach { (id: String, type: ArchipelagoLocationType<*, *>) -> LOGGER.info("Registered location type: $id") }
-    }
-
-    interface LocationTypeRegistrationManager {
-        fun registerLocationType(locationType: ArchipelagoLocationType<*, *>)
-    }
-
-    fun interface RegisterLocationTypeCallback {
-        fun onRegister(manager: LocationTypeRegistrationManager)
+        //parse apmcbundle
     }
 }
 

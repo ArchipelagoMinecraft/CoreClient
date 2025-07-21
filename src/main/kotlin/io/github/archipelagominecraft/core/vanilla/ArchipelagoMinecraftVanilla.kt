@@ -2,17 +2,10 @@ package io.github.archipelagominecraft.core.vanilla
 
 import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore
 import io.github.archipelagominecraft.core.api.ArchipelagoLocationType
-//? if forgeLike {
-import io.github.archipelagominecraft.core.compat.forgeLike.ForgeLike
-import io.github.archipelagominecraft.core.compat.forgeLike.SubscribeEvent
-import io.github.archipelagominecraft.core.forgeLike.LocationTypeRegistrationEvent
-
-//?}
-
 
 // pretend this is in the vanilla mod
 object ArchipelagoMinecraftVanilla {
-    var VANILLA_LOCATION_TYPES: List<ArchipelagoLocationType<*, *>> = listOf(
+    var VANILLA_LOCATION_TYPES: List<ArchipelagoVanillaLocation<*, *>> = listOf(
         AdvancementLocationType()
     )
 
@@ -20,19 +13,13 @@ object ArchipelagoMinecraftVanilla {
         ArchipelagoMinecraftClientCore.LOGGER.info(
             "Initializing ArchipelagoMinecraft Vanilla Entrypoint"
         )
-        //? if forgeLike {
-        ForgeLike.EVENT_BUS.register(object {
-            @SubscribeEvent
-            fun onEvent(evt: LocationTypeRegistrationEvent) =
-                registerLocationTypes(evt)
-
-        })
-        //?} else if fabric {
-        //?}
+        VANILLA_LOCATION_TYPES.forEach {
+            it.registerListeners()
+            ArchipelagoMinecraftClientCore.registerLocationType(it)
+        }
     }
+}
 
-    private fun registerLocationTypes(manager: ArchipelagoMinecraftClientCore.LocationTypeRegistrationManager) {
-        ArchipelagoMinecraftClientCore.LOGGER.info("Registering Archipelago Location Types")
-        VANILLA_LOCATION_TYPES.forEach { manager.registerLocationType(it) }
-    }
+abstract class ArchipelagoVanillaLocation<S: ArchipelagoVanillaLocation<S,T>,T> : ArchipelagoLocationType<S, T> {
+    abstract fun registerListeners()
 }

@@ -4,9 +4,10 @@ import org.gradle.kotlin.dsl.invoke
 import java.util.Properties
 
 plugins {
-    id("com.gradleup.shadow")
     id("org.jetbrains.kotlin.jvm")
+    id("com.gradleup.shadow")
 }
+
 
 // from https://github.com/meza/Stonecraft/blob/ea2eb86e3c4a479dd2e2dfecd42f41450ddc968d/src/main/kotlin/gg/meza/stonecraft/configurations/Dependencies.kt#L75
 public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: String) {

@@ -8,8 +8,6 @@
   },
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    //? if fabric {
-    /*"AdvancementsMixin"
-    *///?}
+    "AdvancementsMixin"
   ]
 }

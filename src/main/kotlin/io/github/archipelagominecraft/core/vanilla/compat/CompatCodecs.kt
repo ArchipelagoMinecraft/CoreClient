@@ -1,4 +1,4 @@
-package io.github.archipelagominecraft.core.compat
+package io.github.archipelagominecraft.core.vanilla.compat
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult

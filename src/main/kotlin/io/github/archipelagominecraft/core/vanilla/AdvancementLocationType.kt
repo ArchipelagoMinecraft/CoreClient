@@ -3,19 +3,18 @@ package io.github.archipelagominecraft.core.vanilla
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import io.github.archipelagominecraft.core.api.ArchipelagoLocationType
 import io.github.archipelagominecraft.core.api.ArchipelagoLocationView
-import io.github.archipelagominecraft.core.compat.CompatCodecs
-import io.github.archipelagominecraft.core.compat.Player
-import io.github.archipelagominecraft.core.compat.ServerPlayer
+import io.github.archipelagominecraft.core.vanilla.compat.ServerPlayer
 import io.github.archipelagominecraft.core.vanilla.AdvancementLocationType.AdvancementLocationTypeData
-import io.github.archipelagominecraft.core.compat.ResourceLocation
+import io.github.archipelagominecraft.core.vanilla.compat.ResourceLocation
+import io.github.archipelagominecraft.core.vanilla.events.AdvancementEarnEvent
+import io.github.archipelagominecraft.core.vanilla.events.PlayerLoginEvent
 import net.minecraft.server.MinecraftServer
 
 //? if forgeLike {
 
-import io.github.archipelagominecraft.core.compat.forgeLike.ForgeLike
-import io.github.archipelagominecraft.core.compat.forgeLike.SubscribeEvent
+import io.github.archipelagominecraft.core.vanilla.compat.CompatCodecs
+
 //?}
 
 //? if >1.12.2 {
@@ -24,9 +23,10 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 //? if fabric {
 /*import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents
-import io.github.archipelagominecraft.core.loaders.fabric.AdvancementEarnEvent
+
 *///?}
 //?}
+
 
 
 private val DATA_CODEC: Codec<AdvancementLocationTypeData> = RecordCodecBuilder.create { builder ->
@@ -41,7 +41,7 @@ private val DATA_CODEC: Codec<AdvancementLocationTypeData> = RecordCodecBuilder.
         .apply(builder, ::AdvancementLocationTypeData)
 }
 // pretend this is in the vanilla mod
-class AdvancementLocationType : ArchipelagoLocationType<AdvancementLocationType, AdvancementLocationTypeData> {
+class AdvancementLocationType : ArchipelagoVanillaLocation<AdvancementLocationType, AdvancementLocationTypeData>() {
     override val namespace: String = "apvanilla"
     override val typeId: String = "advancement"
     override val dataCodec = DATA_CODEC
@@ -69,9 +69,6 @@ class AdvancementLocationType : ArchipelagoLocationType<AdvancementLocationType,
         fun value() = value
     }
 
-    val MinecraftServer.allAdvancements: List<AdvancementHolder>
-        get() = this.advancementManager.advancements.map { AdvancementHolder(it, it.id) }
-
     fun PlayerAdvancements.getOrStartProgress(adv: AdvancementHolder): AdvancementProgress =
         this.getProgress(adv.value)
 
@@ -80,17 +77,29 @@ class AdvancementLocationType : ArchipelagoLocationType<AdvancementLocationType,
 
     val AdvancementProgress.remainingCriteria: Iterable<String>
         get() = this.remaningCriteria
-    *///?} else {
-    val MinecraftServer.allAdvancements: Collection<AdvancementHolder>
-        get() = this.advancements.allAdvancements
-    //?}
-    //? if neoforge {
-    val AdvancementEarnEvent.holder: AdvancementHolder
-        get() = this.advancement
-    //?}
+    *///?}
 
-    fun onPlayerJoin(player: ServerPlayer) {
-        player.server.allAdvancements.forEach { advancement ->
+    val MinecraftServer.allAdvancementsCompat: Collection<AdvancementHolder>
+        get() =
+        //? if >1.12.2 {
+            this.advancements.allAdvancements
+        //?} else {
+    /*this.advancementManager.advancements.map { AdvancementHolder(it, it.id) }
+    *///?}
+
+    inline val ServerPlayer.serverCompat: MinecraftServer
+        get() =
+            //? if <= 1.12.2 {
+        /*this.server
+        *///?} else if >=1.21.4 && <= 1.21.5 {
+            this.serverLevel().server
+    //?} else {
+            /*this.level().server
+    *///?}
+
+    fun onPlayerJoin(playerLoginEvent: PlayerLoginEvent) {
+        val player = playerLoginEvent.player as? ServerPlayer ?: return
+        player.serverCompat.allAdvancementsCompat.forEach { advancement ->
             val locations = advancementsLocationMap.get(advancement.id())
             if (locations.any { it.isCheckedFor(player) }) {
                 player.advancements.getOrStartProgress(advancement).remainingCriteria
@@ -102,52 +111,13 @@ class AdvancementLocationType : ArchipelagoLocationType<AdvancementLocationType,
         }
     }
 
-    fun onAdvancementAchieve(advancement: AdvancementHolder, player: ServerPlayer) {
-        advancementsLocationMap.get(advancement.id).forEach { it.checkFor(player) }
+    fun onAdvancementAchieve(event: AdvancementEarnEvent) {
+        println("onAdvancementAchieve: $event")
+        advancementsLocationMap.get(event.id).forEach { it.checkFor(event.player) }
     }
 
-    //? if forgeLike {
-        typealias PlayerLoggedInEvent =
-        //? if forge {
-            /*net.minecraftforge.fml.common.gameevent.PlayerEvent
-        *///?} else if neoforge {
-                net.neoforged.neoforge.event.entity.player.PlayerEvent
-        //?}
-
-        typealias AdvancementEarnEvent =
-        //? if forge {
-                /*net.minecraftforge.event.entity.player.AdvancementEvent
-        *///?} else if neoforge {
-                net.neoforged.neoforge.event.entity.player.AdvancementEvent
-        //?}
-
-        //? if forge {
-            /*val PlayerLoggedInEvent.entity: Player
-                get() = this.player
-            val AdvancementEarnEvent.holder
-                get() = AdvancementHolder(this.advancement,this.advancement.id)
-    *///?}
-    //?}
-
-    fun registerListeners() {
-        //? if forgeLike {
-
-        ForgeLike.EVENT_BUS.register(object {
-            @SubscribeEvent
-            fun onEvent(it: PlayerLoggedInEvent) {
-                onPlayerJoin(it.entity as? ServerPlayer ?: return)
-            }
-        })
-
-        ForgeLike.EVENT_BUS.register(object{
-            @SubscribeEvent
-            fun onEvent(it: AdvancementEarnEvent) {
-                onAdvancementAchieve(it.holder, it.entity as? ServerPlayer ?: return)
-            }
-        })
-        //?} else if fabric {
-        /*ServerEntityEvents.ENTITY_LOAD.register { e, _ -> (e as? ServerPlayer)?.let { onPlayerJoin(it) } }
-        AdvancementEarnEvent.EVENT.register(::onAdvancementAchieve)
-        *///?}
+    override fun registerListeners() {
+        PlayerLoginEvent.EVENT.registerListener(::onPlayerJoin)
+        AdvancementEarnEvent.EVENT.registerListener(::onAdvancementAchieve)
     }
 }
