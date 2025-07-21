@@ -3,8 +3,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-!versions/dependencies/**
 versions/**
+!versions/dependencies/**
+!versions/dependencies
 
 ### Minecraft ###
 run
