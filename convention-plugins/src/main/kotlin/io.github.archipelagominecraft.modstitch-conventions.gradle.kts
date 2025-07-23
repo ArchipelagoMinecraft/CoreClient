@@ -3,7 +3,7 @@ import io.archipelagominecraft.gradle.*
 
 plugins {
     base
-    id("common-conventions")
+    id("io.github.archipelagominecraft.common-conventions")
     id("dev.isxander.modstitch.base")
 }
 

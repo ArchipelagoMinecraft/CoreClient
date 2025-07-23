@@ -119,7 +119,3 @@ fun Project.requiredProp(property: String, ifNull: (() -> String)? = null): Stri
 fun Project.prop(property: String, required: Boolean = false, ifNull: () -> String? = { null }): String? {
     return propMap(property, required, ifNull) { it }
 }
-
-fun Project.isPropDefined(property: String): Boolean {
-    return propMap(property) { true } == true
-}

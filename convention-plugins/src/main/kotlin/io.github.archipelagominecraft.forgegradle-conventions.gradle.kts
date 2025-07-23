@@ -1,9 +1,8 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.archipelagominecraft.gradle.*
 
 plugins {
     java
-    id("common-conventions")
+    id("io.github.archipelagominecraft.common-conventions")
     id("com.gtnewhorizons.retrofuturagradle")
 }
 

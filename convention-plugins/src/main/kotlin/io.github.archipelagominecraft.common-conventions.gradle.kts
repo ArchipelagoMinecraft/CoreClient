@@ -1,6 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.archipelagominecraft.gradle.*
-import org.gradle.kotlin.dsl.invoke
 import java.util.Properties
 
 plugins {
