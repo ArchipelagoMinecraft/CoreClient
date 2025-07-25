@@ -3,16 +3,11 @@
 # certain platforms or Java versions, and provides a first line of defence
 # against bad commits.
 
-name: build
+name: Build Mod
 on:
   - push
   - pull_request
 
-permissions:
-  issues: write
-  checks: write
-  contents: write
-  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
