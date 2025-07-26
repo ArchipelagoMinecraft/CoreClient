@@ -1,5 +1,6 @@
 package io.archipelagominecraft.gradle
 
+import defaultProperties
 import dev.isxander.modstitch.base.extensions.ModstitchExtension
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import kotlinx.serialization.json.Json
@@ -7,6 +8,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
 
 //taken from (end edited) : https://github.com/isXander/Controlify/blob/multiversion/dev/buildSrc/src/main/kotlin/dev/isxander/controlify/project.gradle.kts
+
 
 data class ModInfo(
     val minecraftVersion: String,
@@ -19,31 +21,30 @@ data class ModInfo(
     val description: String?,
     val authors: List<String>,
     val issueTracker: String?,
-    val packFormat: String?,
-    val mixins: String?,
+    val resourcePackFormat: Int?,
+    val dataPackFormat: Int?,
+    val mixinsFileName: String?,
     val javaVersion: Int,
     private val project: Project
-) {
-
-    fun requiredDep(name: String) = project.requiredProp("deps.$name")
-}
+)
 
 val Project.modInfo: ModInfo
     get() = ModInfo(
-        minecraftVersion = requiredProp("deps.minecraft"),
+        minecraftVersion = requiredProp(Keys.minecraftVersion),
         id = requiredProp("mod.id"),
         name = requiredProp("mod.name"),
         packageName = requiredProp("mod.package"),
-        javaVersion = requiredProp("deps.java").toInt(),
         version = requiredProp("mod.version"),
-        packFormat = prop("mod.pack_format"),
-        mixins = prop("mod.mixins"),
         license = prop("mod.license"),
         homepage = prop("mod.homepage"),
         description = prop("mod.description"),
         authors = requiredProp("mod.authors").split(",").map { it.trim() },
         issueTracker = prop("mod.issue_tracker"),
-        project = this
+        resourcePackFormat = prop(Keys.resourcePackFormat)?.toInt(),
+        dataPackFormat = prop(Keys.dataPackFormat)?.toInt(),
+        mixinsFileName = prop(Keys.mixinsFileName),
+        javaVersion = requiredProp(Keys.javaVersion).toInt(),
+        project = this,
     )
 
 internal val Project.modstitch: ModstitchExtension
@@ -65,11 +66,11 @@ val Project.clientWorkingDirectory
     get() = layout.projectDirectory.dir(prop("run.client_working_directory") ?: "run")
 
 val Project.isForge: Boolean
-    get() = loader == "forge" || loader == "legacy" //todo more generic
+    get() = loader == LoaderConstants.FORGE || loader == LoaderConstants.LEGACY
 val Project.isNeoForge: Boolean
-    get() = loader == "neoforge"
+    get() = loader == LoaderConstants.NEOFORGE
 val Project.isFabric: Boolean
-    get() = loader == "fabric"
+    get() = loader == LoaderConstants.FORGE
 val Project.isForgeLike: Boolean
     get() = isForge || isNeoForge
 
@@ -87,17 +88,15 @@ val Project.replacementProperties: Map<String, String>
         put("mod_authors", authors)
         put("mod_authors_json_list", Json.encodeToString(authors.split(",")))
         put("mod_issue_tracker", requiredProp("mod.issue_tracker"))
-        val handler = if (stonecutter.eval(stonecutter.current.version,">=1.12.2")) {
-            { it: String ->
-                requiredProp(it)
-            }
-        } else {
-            { it: String ->
-                prop(it)
-            }
+
+        if (stonecutter.eval(stonecutter.current.version, ">=1.6.1")){
+            val value = requireNotNull(modInfo.resourcePackFormat){"Resource pack format is required for versions starting with 1.6.1"}
+            put("resource_pack_format", value.toString())
         }
-        val packFormat = handler("mod.pack_format") ?: ""
-        put("mod_pack_format", packFormat)
+        if (stonecutter.eval(stonecutter.current.version,">=1.13")){
+            val value = requireNotNull(modInfo.dataPackFormat){"Data pack format is required for versions starting with 1.13"}
+            put("data_pack_format", value.toString())
+        }
     }
 
 fun <T> Project.propMap(
@@ -106,7 +105,12 @@ fun <T> Project.propMap(
     ifNull: () -> String? = { null },
     block: (String) -> T?
 ): T? {
-    return ((System.getenv(property) ?: branchProj.findProperty(property)?.toString())
+    val versionedProps = defaultProperties[stonecutter.current.version]
+    val priorityProp = (System.getenv(property)
+        ?: branchProj.findProperty(property)?.toString()
+        ?: versionedProps?.get(property))
+    return (
+            priorityProp
         ?.takeUnless { it.isBlank() }
         ?: ifNull())
         .let { if (required && it == null) error("Property $property is required") else it }

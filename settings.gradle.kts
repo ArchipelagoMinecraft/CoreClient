@@ -1,9 +1,8 @@
 pluginManagement {
-//    includeBuild("convention-plugins")
+    includeBuild("convention-plugins")
     repositories {
-        maven{
-            url = uri("https://maven.pkg.github.com/ArchipelagoMinecraft/CoreClient")
-        }
+//        maven("https://maven.pkg.github.com/ArchipelagoMinecraft/CoreClient")
+
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.fabricmc.net")
@@ -43,10 +42,10 @@ stonecutter {
         with(apmc) {
             mc("1.12.2", loaders = listOf("legacy"))
             mc("1.21.4")
-//        mc("1.21.5")
-//        mc("1.21.6")
-//        mc("1.21.7")
-//        mc("1.21.8")
+        mc("1.21.5")
+        mc("1.21.6")
+        mc("1.21.7")
+        mc("1.21.8")
         }
         // This is the default target.
         // https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts

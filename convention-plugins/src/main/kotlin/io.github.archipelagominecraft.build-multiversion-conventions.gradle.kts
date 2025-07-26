@@ -1,9 +1,13 @@
 import dev.kikugie.j52j.J52JExtension
+import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
+import io.archipelagominecraft.gradle.isFabric
+import io.archipelagominecraft.gradle.isForge
+import io.archipelagominecraft.gradle.isForgeLike
+import io.archipelagominecraft.gradle.isNeoForge
 import io.archipelagominecraft.gradle.modInfo
 import io.archipelagominecraft.gradle.serverWorkingDirectory
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.getByType
 
 plugins {
@@ -20,15 +24,17 @@ val j52j = extensions.getByType<J52JExtension>()
 stonecutter.apply {
     filters{
         include("resources/**.json")
+        include("templates/**.mcmeta")
+        include("templates/**.json")
+        include("templates/**.info")
     }
-    consts( //todo fix deprecated
-        "fabric" to true,
-        "neoforge" to true,
-        "forge" to true,
-        "forgeLike" to true,
-    )
+    constants["fabric"] = isFabric
+    constants["neoforge"] = isNeoForge
+    constants["forge"] = isForge
+    constants["forgeLike"] = isForgeLike
 }
 j52j.apply{
+
     params {
         prettyPrinting = true
     }
@@ -47,10 +53,8 @@ tasks.generateBuildConstants{
     additionalConstants.put("MOD_ID", modInfo.id)
     additionalConstants.put("MOD_NAME", modInfo.name)
     additionalConstants.put("MOD_VERSION", modInfo.version)
-    additionalConstants.put("MOD_MIXINS_FILE",modInfo.mixins ?: "")
+    additionalConstants.put("MOD_MIXINS_FILE",modInfo.mixinsFileName ?: "")
 }
-
-
 
 
 val acceptEula: TaskProvider<Task> by tasks.registering {

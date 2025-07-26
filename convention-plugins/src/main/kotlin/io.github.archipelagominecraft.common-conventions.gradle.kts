@@ -25,19 +25,17 @@ public fun loadSpecificDependencyVersions(project: Project, minecraftVersion: St
 loadSpecificDependencyVersions(project,stonecutter.current.version)
 
 val modstitchPlatform = when(loader){
-    "neoforge" -> "moddevgradle"
-    "forge" -> "moddevgradle-legacy"
-    "fabric" -> "loom"
-    "vanilla" -> "moddevgradle"
+    LoaderConstants.NEOFORGE -> "moddevgradle"
+    LoaderConstants.FORGE -> "moddevgradle-legacy"
+    LoaderConstants.FABRIC -> "loom"
+    LoaderConstants.VANILLA -> "moddevgradle"
     "legacy" -> null
-    else -> throw IllegalArgumentException("Unknown loader: $loader")
+    else -> throw IllegalArgumentException("Unknown loader for modstitch: $loader")
 }
-
 
 if(modstitchPlatform != null) {
     project.extra["modstitch.platform"] = modstitchPlatform
 }
-
 
 
 val implementation by configurations.existing

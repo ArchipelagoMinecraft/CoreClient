@@ -24,7 +24,7 @@ modstitch.apply {
     loom {
         // It's not recommended to store the Fabric Loader version in properties.
         // Make sure its up to date.
-        fabricLoaderVersion.set(requiredProp("deps.fabricLoader"))
+        fabricLoaderVersion.set(requiredProp(Keys.fabricLoaderVersion))
 
         // Configure loom like normal in this block.
         configureLoom {
@@ -36,14 +36,14 @@ modstitch.apply {
     // NeoForge
     moddevgradle {
         enable {
-            if (loader == "vanilla") {
-                propMap("deps.neoform") { neoFormVersion = it }
+            if (loader == LoaderConstants.VANILLA) {
+                propMap(Keys.neoformVersion) { neoFormVersion = it }
             } else {
                 if (isModDevGradleRegular)
-                    propMap("deps.neoforge") { neoForgeVersion = it }
+                    propMap(Keys.neoforgeVersion) { neoForgeVersion = it }
                 if (isModDevGradleLegacy) {
-                    propMap("deps.forge") { forgeVersion = it }
-                    propMap("deps.mcp") { mcpVersion = it }
+                    propMap(Keys.forgeVersion) { forgeVersion = it }
+                    propMap(Keys.mcpVersion) { mcpVersion = it }
                 }
             }
             //if vanilla
@@ -67,7 +67,7 @@ modstitch.apply {
     }
 
 
-    val mixinsFile = project.modInfo.mixins
+    val mixinsFile = project.modInfo.mixinsFileName
     if (!mixinsFile.isNullOrBlank()) {
         mixin {
             // You do not need to specify mixins in any mods.json/toml file if this is set to
@@ -91,13 +91,13 @@ modstitch.apply {
 // If you want to create proxy configurations for more source sets, such as client source sets,
 // use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
 
-if (loader == "vanilla") {
+if (loader == LoaderConstants.VANILLA) {
     tasks.withType<AppendMixinDataTask>(){
         enabled = false
     }
     dependencies {
         val compileOnly by configurations.existing
-        compileOnly("org.spongepowered:mixin:${modInfo.requiredDep("vanilla.mixin")}")
+        compileOnly("org.spongepowered:mixin:${requiredProp(Keys.vanillaMixinsVersion)}")
     }
 }
 
@@ -105,7 +105,7 @@ if (loader == "vanilla") {
 dependencies {
     modstitch.loom {
         val modstitchModImplementation by configurations.getting
-        modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${modInfo.requiredDep("fabricApi")}")
+        modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${requiredProp(Keys.fabricApiVersion)}")
     }
 }
 

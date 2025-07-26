@@ -6,10 +6,9 @@ plugins {
     id("com.gtnewhorizons.retrofuturagradle")
 }
 
-val forgeVersion = requiredProp("deps.forge")
-val dfuVersion = requiredProp("deps.datafixerupper")
-val propMappingsChannel = requiredProp("deps.mappings.channel")
-val propMappingsVersion = requiredProp("deps.mappings.version")
+val dfuVersion = requiredProp(Keys.dfuVersion)
+val propMappingsChannel = requiredProp(Keys.mappingsChannel)
+val propMappingsVersion = requiredProp(Keys.mappingsVersion)
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(modInfo.javaVersion)
 tasks.withType<JavaCompile>(){
@@ -52,7 +51,7 @@ dependencies {
     annotationProcessor("com.google.guava:guava:32.1.2-jre")
     annotationProcessor("com.google.code.gson:gson:2.8.9")
 
-    val mixins: String = modUtils.enableMixins("zone.rong:mixinbooter:10.6", "${modInfo.mixins}.refmap.json") as String
+    val mixins: String = modUtils.enableMixins("zone.rong:mixinbooter:10.6", "${modInfo.mixinsFileName}.refmap.json") as String
     api(mixins) {
         isTransitive = false
     }
@@ -71,7 +70,7 @@ tasks.runServer{
 }
 
 minecraft {
-    mcVersion.set("1.12.2")
+    mcVersion.set(modInfo.minecraftVersion)
     mcpMappingChannel.set(propMappingsChannel)
     mcpMappingVersion.set(propMappingsVersion)
 }
@@ -101,7 +100,7 @@ sourceSets.main {
 tasks.jar {
     manifest.attributes(
         "ForceLoadAsMod" to "true",
-        "FMLCorePlugin" to "${modInfo.packageName}.loaders.legacy.LegacyForgeCorePlugin",
+        "FMLCorePlugin" to requiredProp(Keys.fmlCorePluginClass),
         "FMLCorePluginContainsFMLMod" to "true",
     )
 }
