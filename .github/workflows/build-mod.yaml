@@ -12,6 +12,12 @@ on:
       version:
         description: "Version to build and test"
         required: false
+  workflow_call:
+    inputs:
+      version:
+        description: "Version to build and test"
+        required: false
+        type: string
 
 
 concurrency:
