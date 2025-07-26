@@ -3,7 +3,7 @@
 # certain platforms or Java versions, and provides a first line of defence
 # against bad commits.
 
-name: Build and test all versions
+name: Build and test latest or specified version
 on:
   push: { }
   pull_request: { }
@@ -32,7 +32,7 @@ jobs:
         uses: ./.github/actions/setup-gradle
       - id: list_versions
         name: "List stonecutter versions"
-        run:
+        run: |
           VERSIONS=$(./gradlew --no-daemon --parallel -q printVersions | grep -A 2 VERSIONS | tail -n 1)
           if [ "${{ github.event.inputs.version }}" = "" ]; then
             echo "version=$(echo $VERSIONS | jq -r '.[-1]')" >> $GITHUB_OUTPUT
