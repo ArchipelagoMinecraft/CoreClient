@@ -2,7 +2,6 @@ pluginManagement {
     includeBuild("convention-plugins")
     repositories {
 //        maven("https://maven.pkg.github.com/ArchipelagoMinecraft/CoreClient")
-
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.fabricmc.net")
@@ -33,7 +32,7 @@ pluginManagement {
 }
 
 plugins {
-    id("io.github.archipelagominecraft.settings-conventions") version "0.0.1-SNAPSHOT"
+    id("io.github.archipelagominecraft.settings-conventions")
 }
 
 
