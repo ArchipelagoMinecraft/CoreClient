@@ -21,7 +21,7 @@ on:
 
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.version || 'latest' }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.version || 'latest' }}
   cancel-in-progress: true
 
 jobs:
@@ -40,10 +40,10 @@ jobs:
         name: "List stonecutter versions"
         run: |
           VERSIONS=$(./gradlew --no-daemon --parallel -q printVersions | grep -A 2 VERSIONS | tail -n 1)
-          if [ "${{ github.event.inputs.version }}" = "" ]; then
+          if [ "${{ inputs.version }}" = "" ]; then
             echo "versions=$(echo $VERSIONS | jq -c '.[-3:]')" >> $GITHUB_OUTPUT
           else
-            echo "versions=$(echo $VERSIONS | jq -c '[.[] | select(contains (\"${{ github.event.inputs.version }}\"))]')" >> $GITHUB_OUTPUT
+            echo "versions=$(echo $VERSIONS | jq -c '[.[] | select(contains (\"${{ inputs.version }}\"))]')" >> $GITHUB_OUTPUT
           fi
   build_test:
     runs-on: ubuntu-latest
