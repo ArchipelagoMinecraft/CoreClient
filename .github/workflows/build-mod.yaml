@@ -21,7 +21,7 @@ on:
 
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.version || 'latest' }}
   cancel-in-progress: true
 
 jobs:
