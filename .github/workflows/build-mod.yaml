@@ -32,7 +32,7 @@ jobs:
         uses: ./.github/actions/setup-gradle
       - id: list_versions
         name: "List stonecutter versions"
-        run:
+        run: |
           VERSIONS=$(./gradlew --no-daemon --parallel -q printVersions | grep -A 2 VERSIONS | tail -n 1)
           if [ "${{ github.event.inputs.version }}" = "" ]; then
             echo "versions=$(echo $VERSIONS | jq -r '.[-3:]')" >> $GITHUB_OUTPUT
