@@ -20,10 +20,10 @@ jobs:
         uses: ./.github/actions/setup-gradle
       - name: "Build and test conventions"
         working-directory: "convention-plugins"
-        run: ../gradlew build check
+        run: "../gradlew build check"
       - name: "Publish conventions"
         working-directory: "convention-plugins"
-        run: ../gradlew publish
+        run: "../gradlew publish"
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
