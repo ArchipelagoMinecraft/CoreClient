@@ -35,9 +35,9 @@ jobs:
         run: |
           VERSIONS=$(./gradlew --no-daemon --parallel -q printVersions | grep -A 2 VERSIONS | tail -n 1)
           if [ "${{ github.event.inputs.version }}" = "" ]; then
-            echo "versions=$(echo $VERSIONS | jq -r '.[-3:]')" >> $GITHUB_OUTPUT
+            echo "versions=$(echo $VERSIONS | jq -c '.[-3:]')" >> $GITHUB_OUTPUT
           else
-            echo "versions=$(echo $VERSIONS | jq -r '[.[] | select(contains (\"${{ github.event.inputs.version }}\"))]')" >> $GITHUB_OUTPUT
+            echo "versions=$(echo $VERSIONS | jq -c '[.[] | select(contains (\"${{ github.event.inputs.version }}\"))]')" >> $GITHUB_OUTPUT
           fi
   build_test:
     runs-on: ubuntu-latest
