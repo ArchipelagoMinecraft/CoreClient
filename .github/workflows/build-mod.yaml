@@ -19,7 +19,7 @@ jobs:
     outputs:
       versions: ${{ steps.list_versions.outputs.versions }}
     steps:
-      - name: "⬇Checkout"
+      - name: "Checkout"
         uses: actions/checkout@v4
       - name: "Setup Gradle"
         uses: ./.github/actions/setup-gradle
