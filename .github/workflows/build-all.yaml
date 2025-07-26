@@ -3,10 +3,9 @@
 # certain platforms or Java versions, and provides a first line of defence
 # against bad commits.
 
-name: Build Mod
+name: Build and test all versions
 on:
-  - push
-  - pull_request
+  workflow_dispatch:
 
 
 concurrency:
@@ -25,7 +24,7 @@ jobs:
         uses: ./.github/actions/setup-gradle
       - id: list_versions
         name: "List stonecutter versions"
-        run: |
+        run:
           VERSIONS=$(./gradlew --no-daemon --parallel -q printVersions | grep -A 2 VERSIONS | tail -n 1)
           echo VERSIONS$
           echo "versions=$VERSIONS" >> $GITHUB_OUTPUT
@@ -37,7 +36,7 @@ jobs:
       matrix:
         version: ${{ fromJson(needs.discover-versions.outputs.versions) }}
     steps:
-      - name: "⬇Checkout"
+      - name: "Checkout"
         uses: actions/checkout@v4
       - name: "Setup Gradle"
         uses: ./.github/actions/setup-gradle

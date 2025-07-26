@@ -1,0 +1,51 @@
+# Automatically build the project and run any configured tests for every push
+# and submitted pull request. This can help catch issues that only occur on
+# certain platforms or Java versions, and provides a first line of defence
+# against bad commits.
+
+name: Build and test all versions
+on:
+  push: { }
+  pull_request: { }
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build and test"
+        required: false
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover-latest:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.list_versions.outputs.version }}
+    steps:
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v3.2.0
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Setup Gradle"
+        uses: ./.github/actions/setup-gradle
+      - id: list_versions
+        name: "List stonecutter versions"
+        run:
+          VERSIONS=$(./gradlew --no-daemon --parallel -q printVersions | grep -A 2 VERSIONS | tail -n 1)
+          if [ "${{ github.event.inputs.version }}" = "" ]; then
+            echo "version=$(echo $VERSIONS | jq -r '.[-1]')" >> $GITHUB_OUTPUT
+          else
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+  build_test:
+    runs-on: ubuntu-latest
+    needs: discover-latest
+    name: "Build and test ${{ needs.discover-latest.outputs.version }}"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Setup Gradle"
+        uses: ./.github/actions/setup-gradle
+      - name: "Build and test ${{ needs.discover-latest.outputs.version }}"
+        run: ./gradlew :${{ needs.discover-latest.outputs.version }}:check
