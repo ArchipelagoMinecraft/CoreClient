@@ -16,6 +16,21 @@ tasks.withType<JavaCompile>(){
     targetCompatibility = modInfo.javaVersion.toString()
 }
 
+val multiModImplementation = configurations.getByName("multiModImplementation")
+
+afterEvaluate {
+    dependencies {
+
+        multiModImplementation.dependencies.forEach { dep ->
+            // Convert the dependency notation via rfg.deobf
+            val transformed = when (dep) {
+                is ModuleDependency -> rfg.deobf("${dep.group}:${dep.name}:${dep.version}")
+                else -> throw IllegalArgumentException("Unsupported dependency type: $dep")
+            }
+            implementation(transformed)
+        }
+    }
+}
 
 
 

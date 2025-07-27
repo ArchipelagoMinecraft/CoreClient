@@ -40,6 +40,8 @@ if(modstitchPlatform != null) {
 
 val implementation by configurations.existing
 
+configurations.create("multiModImplementation")
+
 val shade by configurations.creating
 implementation {
     extendsFrom(shade)

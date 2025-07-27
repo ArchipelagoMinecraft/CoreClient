@@ -8,6 +8,13 @@ plugins {
 }
 
 
+val modstitchModImplementation by configurations.existing
+
+modstitchModImplementation {
+    extendsFrom(configurations["multiModImplementation"])
+}
+
+
 
 modstitch.apply {
     minecraftVersion.set(modInfo.minecraftVersion)

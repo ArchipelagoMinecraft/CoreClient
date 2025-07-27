@@ -1,6 +1,6 @@
 package io.github.archipelagominecraft.core.api
 
-import io.github.archipelagominecraft.core.vanilla.compat.Player
+import io.github.archipelagominecraft.core.compat.Player
 
 
 @Suppress("unused")

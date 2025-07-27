@@ -1,7 +1,6 @@
 pluginManagement {
     includeBuild("convention-plugins")
     repositories {
-//        maven("https://maven.pkg.github.com/ArchipelagoMinecraft/CoreClient")
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.fabricmc.net")

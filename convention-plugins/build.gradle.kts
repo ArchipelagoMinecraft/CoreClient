@@ -5,7 +5,7 @@ plugins{
 }
 
 group = "io.github.archipelagominecraft"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.1-SNAPSHOT"
 
 @Suppress("UnstableApiUsage")
 repositories{
@@ -51,10 +51,10 @@ publishing {
             url = uri("https://maven.pkg.github.com/ArchipelagoMinecraft/CoreClient")
             credentials {
                 username = ""
-                password = System.getenv("GITHUB_TOKEN")
+                password = providers.gradleProperty("gpr.token").get()
             }
         }
-
+        mavenLocal()
     }
 }
 
