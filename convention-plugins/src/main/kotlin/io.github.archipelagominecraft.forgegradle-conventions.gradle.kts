@@ -88,36 +88,63 @@ minecraft {
     mcVersion.set(modInfo.minecraftVersion)
     mcpMappingChannel.set(propMappingsChannel)
     mcpMappingVersion.set(propMappingsVersion)
+    if (loader == LoaderConstants.FORGE){
+        usesFml.set(true)
+        usesForge.set(true)
+    } else if (loader == LoaderConstants.VANILLA){
+        usesFml.set(true)
+        usesForge.set(false)
+        useDependencyAccessTransformers.set(false)
+
+    } else {
+        error("Unsupported loader type for retrofuturagradle: $loader")
+    }
+}
+
+if(loader == LoaderConstants.VANILLA){
+    afterEvaluate {
+        tasks.named("runServer"){
+            enabled = false
+        }
+        tasks.named("runClient"){
+            enabled = false
+        }
+    }
 }
 
 val mainSourceSet = project.extensions.getByType<SourceSetContainer>()["main"]
 val templates = project.objects.sourceDirectorySet("templates", "Mod metadata resource templates")
 mainSourceSet.extensions.add("templates", templates)
 templates.srcDir("src/main/templates")
-val generateTemplates by tasks.registering(ProcessResources::class) {
-    inputs.property("allProperties", project.replacementProperties)
+if(loader != LoaderConstants.VANILLA) {
+    val generateTemplates by tasks.registering(ProcessResources::class) {
+        inputs.property("allProperties", project.replacementProperties)
 
-    from(templates)
-    into(project.layout.buildDirectory.dir("generated/metadata"))
-    include("mcmod.info","pack.mcmeta")
-    doFirst {
-        expand(project.replacementProperties)
+        from(templates)
+        into(project.layout.buildDirectory.dir("generated/metadata"))
+        include("mcmod.info", "pack.mcmeta")
+        doFirst {
+            expand(project.replacementProperties)
+        }
+    }
+    sourceSets.main {
+        resources {
+            srcDir(generateTemplates)
+        }
     }
 }
 
 val relocated = modInfo.packageName + ".relocated"
 
-sourceSets.main {
-    resources {
-        srcDir(generateTemplates)
+if(loader != LoaderConstants.VANILLA) {
+
+    tasks.jar {
+        manifest.attributes(
+            "ForceLoadAsMod" to "true",
+            "FMLCorePlugin" to requiredProp(Keys.fmlCorePluginClass),
+            "FMLCorePluginContainsFMLMod" to "true",
+        )
     }
-}
-tasks.jar {
-    manifest.attributes(
-        "ForceLoadAsMod" to "true",
-        "FMLCorePlugin" to requiredProp(Keys.fmlCorePluginClass),
-        "FMLCorePluginContainsFMLMod" to "true",
-    )
 }
 
 tasks.shadowJar {
@@ -126,5 +153,22 @@ tasks.shadowJar {
 tasks.reobfJar {
     inputJar.set(tasks.shadowJar.flatMap { it.archiveFile })
     dependsOn(tasks.shadowJar)
+}
+
+//tasks.getByName("createMcLauncherFiles").apply {
+//    dependsOn(tasks.getByName("kspMcLauncherKotlin"))
+//}
+
+tasks.configureEach {
+    if (name == "kspMcLauncherKotlin") {
+        dependsOn(tasks.findByName("createMcLauncherFiles"))
+        dependsOn(tasks.findByName("processPatchedMcResources"))
+    }
+    if(name == "kspPatchedMcKotlin"){
+        dependsOn(tasks.findByName("decompressDecompiledSources"))
+    }
+    if(name == "kspInjectedTagsKotlin"){
+        dependsOn(tasks.findByName("processPatchedMcResources"))
+    }
 }
 

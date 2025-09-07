@@ -1,4 +1,5 @@
 import dev.kikugie.stonecutter.controller.StonecutterControllerExtension
+import io.archipelagominecraft.gradle.loader
 import kotlinx.serialization.json.Json
 import org.jetbrains.gradle.ext.runConfigurations
 import org.jetbrains.gradle.ext.settings
@@ -20,23 +21,24 @@ tasks.register("ensureVCSVersion") {
     }
 }
 
-
-idea.project.settings {
-    runConfigurations {
-        register<org.jetbrains.gradle.ext.Gradle>("Build") {
-            this.taskNames = listOf("buildActive")
-        }
-        register<org.jetbrains.gradle.ext.Gradle>("Run Server") {
-            this.taskNames = listOf("runServerActive")
-        }
-        register<org.jetbrains.gradle.ext.Gradle>("Run Client") {
-            this.taskNames = listOf("runClientActive")
-        }
-        register<org.jetbrains.gradle.ext.Gradle>("Restore VCS Version") {
-            this.taskNames = listOf("'Reset active project'")
-        }
-        register<org.jetbrains.gradle.ext.Gradle>("Refresh Stonecutter comments") {
-            this.taskNames = listOf("'Refresh active project'")
+if (idea.project != null) {
+    idea.project.settings {
+        runConfigurations {
+            register<org.jetbrains.gradle.ext.Gradle>("Build") {
+                this.taskNames = listOf("buildActive")
+            }
+            register<org.jetbrains.gradle.ext.Gradle>("Run Server") {
+                this.taskNames = listOf("runServerActive")
+            }
+            register<org.jetbrains.gradle.ext.Gradle>("Run Client") {
+                this.taskNames = listOf("runClientActive")
+            }
+            register<org.jetbrains.gradle.ext.Gradle>("Restore VCS Version") {
+                this.taskNames = listOf("'Reset active project'")
+            }
+            register<org.jetbrains.gradle.ext.Gradle>("Refresh Stonecutter comments") {
+                this.taskNames = listOf("'Refresh active project'")
+            }
         }
     }
 }
@@ -55,7 +57,8 @@ fun activeTask(name: String): TaskProvider<Task> {
         dependsOn(stonecutter.current!!.project + ":${name}")
     }
 }
-
-activeTask("runServer")
-activeTask("runClient")
+if (stonecutter.current?.project?.split("-", limit = 2)?.get(1) != LoaderConstants.VANILLA) {
+    activeTask("runServer")
+    activeTask("runClient")
+}
 activeTask("build")

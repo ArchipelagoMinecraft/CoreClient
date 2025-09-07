@@ -70,7 +70,7 @@ val Project.isForge: Boolean
 val Project.isNeoForge: Boolean
     get() = loader == LoaderConstants.NEOFORGE
 val Project.isFabric: Boolean
-    get() = loader == LoaderConstants.FORGE
+    get() = loader == LoaderConstants.FABRIC
 val Project.isForgeLike: Boolean
     get() = isForge || isNeoForge
 

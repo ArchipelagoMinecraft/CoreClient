@@ -35,21 +35,42 @@ plugins {
 }
 
 
+val apiProject = ":api"
+val modProject = ":mod"
+
+val supportedVersions = listOf(
+    "1.12.2",
+    "1.21.4",
+    "1.21.5",
+    "1.21.6",
+    "1.21.7",
+    "1.21.8"
+)
+
 stonecutter {
-    create(rootProject) {
+    create(modProject) {
         with(apmc) {
-            mc("1.12.2", loaders = listOf("legacy"))
-            mc("1.21.4")
-        mc("1.21.5")
-        mc("1.21.6")
-        mc("1.21.7")
-        mc("1.21.8")
+            supportedVersions.forEach {
+                if (stonecutter.eval(it, "<=1.12.2"))
+                    mc(it,loaders = listOf("forge"))
+                else
+                    mc(it, loaders = listOf("neoforge", "fabric"))
+            }
         }
         // This is the default target.
         // https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts
         vcsVersion = "1.21.4-neoforge"
     }
+    create(apiProject) {
+        with(apmc) {
+            supportedVersions.forEach {
+                mc(it,loaders = listOf("vanilla"))
+            }
+        }
+        // This is the default target.
+        // https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts
+        vcsVersion = "1.21.4-vanilla"
+    }
 }
 
 rootProject.name = "ArchipelagoMinecraftClientCore"
-

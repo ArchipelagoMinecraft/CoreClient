@@ -61,17 +61,17 @@ publishing {
 
 dependencies{
     fun plugin(id: String, version: String) = "$id:$id.gradle.plugin:$version"
-
-    implementation(plugin("dev.kikugie.j52j", "2.0"))
-    implementation(plugin("dev.kikugie.stonecutter", "0.7-beta.7"))
+    implementation(plugin("com.google.devtools.ksp", "2.2.0-2.0.2"))
+    implementation(plugin("dev.kikugie.fletching-table","0.1.0-alpha.15"))
+    implementation(plugin("dev.kikugie.stonecutter", "0.7.8"))
     implementation(plugin("org.cthing.build-constants", "2.0.0"))
     implementation(plugin("me.modmuss50.mod-publish-plugin", "0.8.4"))
     implementation(plugin("org.jetbrains.kotlin.jvm", "2.2.0"))
     implementation(plugin("org.jetbrains.gradle.plugin.idea-ext", "1.2"))
-    implementation(plugin("dev.isxander.modstitch.base", "0.5.16-unstable"))
-    implementation(plugin("dev.kikugie.stonecutter", "0.7-beta.7"))
+    implementation(plugin("dev.isxander.modstitch.base", "0.7.0-unstable"))
     implementation(plugin("fabric-loom", "1.10.5"))
     implementation(plugin("net.neoforged.moddev", "2.0.80"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation(plugin( "org.cthing.build-constants","2.0.0"))
     implementation("net.minecraftforge.gradle","ForgeGradle", "6.0+")
     implementation(plugin("org.spongepowered.mixin", "0.7-SNAPSHOT"))

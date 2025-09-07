@@ -1,8 +1,6 @@
-import dev.isxander.modstitch.base.AppendMixinDataTask
+import dev.isxander.modstitch.base.AppendModMetadataTask
 import io.archipelagominecraft.gradle.*
-
 plugins {
-    base
     id("io.github.archipelagominecraft.common-conventions")
     id("dev.isxander.modstitch.base")
 }
@@ -14,12 +12,9 @@ modstitchModImplementation {
     extendsFrom(configurations["multiModImplementation"])
 }
 
-
-
 modstitch.apply {
     minecraftVersion.set(modInfo.minecraftVersion)
-
-    javaTarget.set(modInfo.javaVersion)
+    javaVersion.set(modInfo.javaVersion)
 
     // This metadata is used to fill out the information inside
     // the metadata files found in the templates folder.
@@ -42,23 +37,23 @@ modstitch.apply {
 
     // NeoForge
     moddevgradle {
-        enable {
             if (loader == LoaderConstants.VANILLA) {
-                propMap(Keys.neoformVersion) { neoFormVersion = it }
+                propMap(Keys.neoformVersion) { neoFormVersion.set(it) }
             } else {
                 if (isModDevGradleRegular)
-                    propMap(Keys.neoforgeVersion) { neoForgeVersion = it }
+                    propMap(Keys.neoforgeVersion) { neoForgeVersion.set(it) }
                 if (isModDevGradleLegacy) {
-                    propMap(Keys.forgeVersion) { forgeVersion = it }
-                    propMap(Keys.mcpVersion) { mcpVersion = it }
+                    propMap(Keys.forgeVersion) { forgeVersion.set(it) }
+                    propMap(Keys.mcpVersion) { mcpVersion.set(it) }
                 }
             }
             //if vanilla
 //            propMap("deps.neoform") {neoFormVersion = it }
-        }
 
-        defaultRuns()
-        configureNeoforge {
+        if(loader != LoaderConstants.VANILLA) {
+            defaultRuns()
+        }
+        configureNeoForge {
             runs.all {
                 if(type.get() == "client"){
                     gameDirectory.set(project.clientWorkingDirectory)
@@ -99,7 +94,7 @@ modstitch.apply {
 // use the modstitch.createProxyConfigurations(sourceSets["client"]) function.
 
 if (loader == LoaderConstants.VANILLA) {
-    tasks.withType<AppendMixinDataTask>(){
+    tasks.withType<AppendModMetadataTask> {
         enabled = false
     }
     dependencies {
@@ -117,8 +112,15 @@ dependencies {
 }
 
 
+// fix stonecutterGenerate task dependencies
+tasks.named<ProcessResources>("generateModMetadata") {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    dependsOn("stonecutterGenerate")
+}
 modstitch.moddevgradle {
-    tasks.named("createMinecraftArtifacts") {
-        dependsOn("stonecutterGenerate")
+    modstitch.onEnable {
+        tasks.named("createMinecraftArtifacts") {
+            dependsOn("stonecutterGenerate")
+        }
     }
 }

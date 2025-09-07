@@ -1,4 +1,4 @@
-import dev.kikugie.stonecutter.data.tree.TreeBuilder
+import dev.kikugie.stonecutter.data.tree.builder.TreeBuilder
 import dev.kikugie.stonecutter.settings.StonecutterSettingsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
@@ -44,8 +44,7 @@ abstract class SettingsPlugin : Plugin<Settings> {
 object APMCSettings  {
     fun TreeBuilder.mc(
         mcVersion: String, name: String = mcVersion, loaders: Iterable<String>
-        = listOf("fabric", "neoforge", "vanilla")
     ) {
-        loaders.forEach { vers("$name-$it", mcVersion) }
+        loaders.forEach { version("$name-$it", mcVersion) }
     }
 }

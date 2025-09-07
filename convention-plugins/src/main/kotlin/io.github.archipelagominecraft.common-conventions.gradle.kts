@@ -3,7 +3,10 @@ import io.archipelagominecraft.gradle.*
 import java.util.Properties
 
 plugins {
+    base
     id("org.jetbrains.kotlin.jvm")
+    id("com.google.devtools.ksp")
+    id("dev.kikugie.fletching-table")
     id("com.gradleup.shadow")
 }
 
