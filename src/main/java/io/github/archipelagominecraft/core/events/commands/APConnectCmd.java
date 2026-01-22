@@ -12,9 +12,9 @@ public class APConnectCmd {
     public static void connectCommand(CommandDispatcher<CommandSourceStack> command) {
         // Connection Command
         command.register(Commands.literal("connect")
-            .then(Commands.argument("server", StringArgumentType.string()))
-            .then(Commands.argument("port", IntegerArgumentType.integer()))
-            .then(Commands.argument("slot", StringArgumentType.string()))
+            .then(Commands.argument("server", StringArgumentType.string())
+            .then(Commands.argument("port", IntegerArgumentType.integer())
+            .then(Commands.argument("slot", StringArgumentType.string())
                 .executes(context -> APClient.tryConnection(
                         APContext.getContext(),
                         StringArgumentType.getString(context, "server"),
@@ -22,7 +22,7 @@ public class APConnectCmd {
                         StringArgumentType.getString(context, "slot"),
                         ""
                 ))
-                .then(Commands.argument("password", StringArgumentType.string()))
+                .then(Commands.argument("password", StringArgumentType.string())
                     .executes(context -> APClient.tryConnection(
                             APContext.getContext(),
                             StringArgumentType.getString(context, "server"),
@@ -30,6 +30,6 @@ public class APConnectCmd {
                             StringArgumentType.getString(context, "slot"),
                             StringArgumentType.getString(context, "password")
                     ))
-        );
+        )))));
     }
 }

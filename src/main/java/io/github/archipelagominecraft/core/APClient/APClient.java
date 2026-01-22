@@ -18,7 +18,11 @@ public class APClient extends Client {
 
     public static int tryConnection(APContext context, String address, int port, String slot, String password) {
         APClient apClient = context.getClient();
-
+        if (apClient != null) {
+            apClient.close();
+        }
+        apClient = new APClient(context);
+        context.setClient(apClient);
         apClient.setPassword(password);
         apClient.setName(slot);
         apClient.setItemsHandlingFlags(ItemsHandling.SEND_ITEMS + ItemsHandling.SEND_OWN_ITEMS + ItemsHandling.SEND_STARTING_INVENTORY);
