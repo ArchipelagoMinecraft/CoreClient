@@ -12,4 +12,11 @@ public class APContext {
     public APClient getClient() {
         return client;
     }
+
+    public void setClient(APClient client) {
+        if(client == this.client) {
+            return;
+        }
+        this.client = client;
+    }
 }
