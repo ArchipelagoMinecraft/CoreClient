@@ -1,14 +1,7 @@
-import dev.kikugie.fletching_table.extension.FletchingTableExtension
+//import dev.kikugie.fletching_table.extension.FletchingTableExtension
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
-import io.archipelagominecraft.gradle.isFabric
-import io.archipelagominecraft.gradle.isForge
-import io.archipelagominecraft.gradle.isForgeLike
-import io.archipelagominecraft.gradle.isNeoForge
-import io.archipelagominecraft.gradle.loader
-import io.archipelagominecraft.gradle.modInfo
-import io.archipelagominecraft.gradle.serverWorkingDirectory
+import io.archipelagominecraft.gradle.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.gradle.kotlin.dsl.getByType
 
 plugins {
     id("io.github.archipelagominecraft.conditional-modstitch")
@@ -17,11 +10,17 @@ plugins {
     `maven-publish`
 }
 
+
+//tasks.named("kspKotlin"){
+//    dependsOn("generateBuildConstants")
+//}
+
+
 val stonecutter = extensions.getByType<StonecutterBuildExtension>()
-val fletchingTable = extensions.getByType<FletchingTableExtension>()
+//val fletchingTable = extensions.getByType<FletchingTableExtension>()
 
 stonecutter.apply {
-    filters{
+    filters {
         include("resources/**.json")
         include("templates/**.mcmeta")
         include("templates/**.json")
@@ -32,18 +31,38 @@ stonecutter.apply {
     constants["forge"] = isForge
     constants["forgeLike"] = isForgeLike
 }
-fletchingTable.apply {
-    j52j.register("main") {
-//        this@register.prettyPrint.set(true)
-        extension("json","resource/**/*.json5")
+//fletchingTable.apply {
+//    j52j.register("main") {
+////        this@register.prettyPrint.set(true)
+//        extension("json", "resource/**/*.json5")
+//    }
+//}
+
+tasks.configureEach {
+//    if(name.startsWith("stonecutterGenerate")) {
+//        dependsOn(name.replace("Generate","Merge"))
+//    }
+//    if(name.startsWith("stonecutterPrepareTest")) {
+//        dependsOn(name.replace("Prepare","Merge"))
+//    }
+
+    if(name == "compileInjectedTagsKotlin"){
+        dependsOn("injectTags")
+    }
+    if(name == "kspInjectedTagsKotlin"){
+        dependsOn("injectTags")
     }
 }
-
 
 if (loader != LoaderConstants.VANILLA) {
 
     tasks.withType<KotlinCompile> {
         dependsOn(tasks.generateBuildConstants)
+    }
+    tasks.configureEach {
+        if (name == "kspKotlin") {
+            dependsOn(tasks.generateBuildConstants)
+        }
     }
     tasks.generateBuildConstants {
         classname.set(modInfo.packageName + "." + modInfo.name + "Constants")

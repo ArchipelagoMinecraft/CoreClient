@@ -2,12 +2,12 @@ package io.github.archipelagominecraft.core
 
 import org.slf4j.LoggerFactory
 
-interface Logger{
+internal interface Logger{
     fun info(message: String)
     fun warn(message: String)
     fun error(message: String)
 }
-object LogManager {
+internal object LogManager {
     @JvmStatic
     fun getLogger(clazz: Class<*>): Logger {
         return getLogger(clazz.name)

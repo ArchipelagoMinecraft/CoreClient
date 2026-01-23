@@ -1,4 +1,4 @@
-package io.github.archipelagominecraft.api.compat
+package io.github.archipelagominecraft.core.api.compat
 
 import net.minecraft.world.entity.player.Player
 

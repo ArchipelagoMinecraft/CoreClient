@@ -1,114 +1,205 @@
 package io.github.archipelagominecraft.core
 
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
-import io.github.archipelagominecraft.api.ArchipelagoMinecraftCoreRegistration
-import io.github.archipelagominecraft.api.compat.Player
+import io.github.archipelagominecraft.core.api.ArchipelagoMinecraftCoreRegistration
+import io.github.archipelagominecraft.core.api.ArchipelagoSlot
+import io.github.archipelagominecraft.core.api.compat.Player
+import io.github.archipelagominecraft.core.api.features.ArchipelagoRandomizerFeature
+import io.github.archipelagominecraft.core.api.items.ArchipelagoItemType
+import io.github.archipelagominecraft.core.api.items.ArchipelagoItemView
+import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationType
+import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationView
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
 
-const val DEFINITIONS_PATH = "../../../../definitions.json"
+//json5 to allow comments, Gson
+const val DEFINITIONS_PATH = "../../../../definitions.json5"
 
 
-object ArchipelagoMinecraftClientCore {
+internal object ArchipelagoMinecraftClientCore {
     @JvmField
     internal val LOGGER: Logger = LogManager.getLogger(ArchipelagoClientConstants.MOD_NAME)
 
 
+    /**
+     * Called as soon as possible, when the mod is initialized
+     */
     @JvmStatic
     internal fun initialize() {
         LOGGER.info("Hello from ArchipelagoMinecraftClientCore!")
+        //todo for sample purposes, they should be in the "provider" mod
+        ArchipelagoMinecraftCoreRegistration.registerItemType(SampleArchipelagoItemType)
+        ArchipelagoMinecraftCoreRegistration.registerLocationType(SampleArchipelagoLocationType)
+        ArchipelagoMinecraftCoreRegistration.registerRandomizerFeature(SampleArchipelagoFeatureWorldSeedRando)
     }
 
+    /**
+     * Called after provider mods had a chance to register their types
+     */
     @JvmStatic
     internal fun afterRegistration() {
         val locationTypes = ArchipelagoMinecraftCoreRegistration.locationTypes
-        LOGGER.info("All location types have been registered (${locationTypes.size}) : $locationTypes")
         val itemTypes = ArchipelagoMinecraftCoreRegistration.itemTypes
-        LOGGER.info("All item types have been registered (${itemTypes.size}): $itemTypes")
+        val randomizerFeatures = ArchipelagoMinecraftCoreRegistration.randomizerFeatures
 
+        LOGGER.info("All location types have been registered (${locationTypes.size}) : $locationTypes")
+        LOGGER.info("All item types have been registered (${itemTypes.size}): $itemTypes")
+        LOGGER.info("All randomizer features have been registered: (${randomizerFeatures.size}): $randomizerFeatures")
+
+        //get definitions file contents
         val defFile = File("").resolve(DEFINITIONS_PATH).canonicalFile
         val definitionsContent = defFile.readText()
-        LOGGER.info("definitions path: ${defFile.path}")
-        LOGGER.info("Definitions: $definitionsContent")
+        LOGGER.info("Using definitions file : ${defFile.path}")
 
 
-        // language=json
-        val input = Gson().fromJson("""
-    {
-      "items": {
-        "1": {
-          "handlers": [
-            {
-              "type": "apsample:sample_type",
-              "data": {
-                "value": "example"
-              }
-            }
-          ]
-        }
-      },
-      "locations": {}
-    }
-        """.trimIndent(), JsonObject::class.java)
+        //parse definitions json and create the codecs
+        val input = Gson().fromJson(definitionsContent, JsonElement::class.java)
         val codec = ArchipelagoDefinitions.codec(
-            mapOf(SampleType().let { it.id to it }),
-            emptyMap()
+            itemTypes,
+            locationTypes,
         )
-        val defs = ArchipelagoDefinitions(
-            mapOf(
-                1 to ArchipelagoItemDefinition(
-                    listOf(
-                        ArchipelagoItemHandler(
-                            SampleType(),
-                            SampleType.SampleData("example")
-                        )
-                    )
-                )
-            ),
-            emptyMap()
-        )
-        val encoded = codec.encodeStart(JsonOps.INSTANCE, defs)
-        LOGGER.info("Encoded defs: $encoded")
+
         val decoded = codec.decode(JsonOps.INSTANCE, input)
 
         val error = decoded.error().getOrNull()
         if (error != null) {
-            LOGGER.error("Failed to decode definitions: ${error}")
-            throw IllegalStateException("Failed to decode definitions file at ${defFile.path}: ${error}")
+            LOGGER.error("Failed to decode definitions: $error")
+            throw IllegalStateException("Failed to decode definitions file at ${defFile.path}: $error")
         }
         val definitions = decoded.result().get().first
 
         LOGGER.info("All definitions have been registered")
         LOGGER.info("Running with ${definitions.items.size} items and ${definitions.locations.size} locations.")
 
-        definitions.locations.forEach { id, location ->
-            val type = location.handler.type
-            val data = location.handler.data
-            LOGGER.info("Location $id is of type ${type.id} with data $data")
-//            type.prepareLocation(null, data) //Todo after client connection
+        //todo quick mock of an actual client
+        val serverslot = object : ArchipelagoSlot {
+            override val isServerwideSlot: Boolean = true
         }
-        definitions.items.forEach { id, item ->
+        ArchipelagoMinecraftCoreRegistration.internalRegisterPlayerSlots(
+            { serverslot },
+            { emptySet() }, //todo actually look up all connected players (for the server-as-slot case)
+            setOf(serverslot)
+        )
+
+        val client: ArchipelagoClient = object : ArchipelagoClient {
+            override val managedSlots: Set<ArchipelagoSlot> = setOf(serverslot)
+
+            override fun isLocationCheckedForSlot(
+                slot: ArchipelagoSlot,
+                location: APLocationID,
+            ): Boolean = true
+
+            override fun markLocationAsCheckedForSlot(
+                slot: ArchipelagoSlot,
+                location: APLocationID,
+            ) {
+            }
+
+            override fun wasItemReceivedForSlot(
+                slot: ArchipelagoSlot,
+                item: APItemID,
+            ) = true
+
+            override fun registerItemListener(function: (id: APItemID, slot: ArchipelagoSlot) -> Unit) {
+
+            }
+
+            override fun getSlotData(
+                key: String,
+                slot: ArchipelagoSlot,
+            ): String {
+                return "42" // because the sample feature requires a number
+            }
+
+        }
+        //end mock
+
+        definitions.locations.forEach { (id, location) ->
+            prepareLocationHandler(
+                location.handler,
+                ArchipelagoLocationImpl(id, client)
+            )
+            LOGGER.info("Location $id is of type ${location.handler.type.id} with data ${location.handler.data}")
+
+        }
+        definitions.items.forEach { (id, item) ->
+            val itemView = ArchipelagoItemImpl(id, client)
             item.handlers.forEach { handler ->
                 val type = handler.type
                 val data = handler.data
                 LOGGER.info("Item $id is of type ${type.id} with data $data")
-//                type.prepareItemForWorld(false, data) //Todo after client connection
+                prepareItemHandler(
+                    handler,
+                    itemView
+                )
             }
         }
+
+        randomizerFeatures.values.forEach { feature ->
+            prepareFeatureHandler(
+                feature,
+                client.managedSlots.associateWith {
+                    client.getSlotData(feature.id, it)
+                }
+            )
+        }
+
+
     }
 
+    //utility function for generics
+    private fun <T : ArchipelagoLocationType<D>, D> prepareLocationHandler(
+        handler: ArchipelagoHandler<T, D>,
+        locationView: ArchipelagoLocationView,
+    ) {
+        handler.type.prepareLocation(locationView, handler.data)
+    }
 
+    private fun <T : ArchipelagoItemType<D>, D> prepareItemHandler(
+        handler: ArchipelagoHandler<T, D>,
+        itemView: ArchipelagoItemView,
+    ) {
+        handler.type.prepareItem(itemView, handler.data)
+    }
+
+    private fun <D> prepareFeatureHandler(
+        handler: ArchipelagoRandomizerFeature<D>,
+        unserializedSlotData: Map<ArchipelagoSlot, String>,
+    ) {
+        val slotDatas = unserializedSlotData.mapValues { (_, value) ->
+            val gsonParsed = Gson().fromJson(value, JsonElement::class.java)
+            val decoded = handler.dataCodec.decode(JsonOps.INSTANCE, gsonParsed)
+            decoded.getOrThrow {
+                IllegalStateException("Failed to parse slot data for feature: ${handler.id}, error : $it")
+            }.first
+        }
+        handler.prepareFeature(
+            ArchipelagoRandomizationFeatureImpl(
+                slotDatas
+            )
+        )
+    }
+
+    /**
+     * For each location, check if the player has checked them or not in-game, and propagate this to
+     * Archipelago
+     */
     internal fun synchronizeLocations(player: Player) {
         //todo
     }
 
+    /**
+     * For each item the player has received on Archipelago, make sure that it was awared to the player already
+     * and if not, award them now
+     */
     internal fun synchronizeItems(player: Player) {
         //todo
     }
 
-    //todo link to event handlers
+    //todo link to event handlers per-platform
     internal fun onPlayerJoin(player: Player) {
         //todo synchronize items and locations for the player
         synchronizeLocations(player)

@@ -6,7 +6,7 @@ plugins {
     base
     id("org.jetbrains.kotlin.jvm")
     id("com.google.devtools.ksp")
-    id("dev.kikugie.fletching-table")
+//    id("dev.kikugie.fletching-table")
     id("com.gradleup.shadow")
 }
 

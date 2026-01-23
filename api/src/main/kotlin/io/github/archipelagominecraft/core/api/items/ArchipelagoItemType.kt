@@ -1,45 +1,34 @@
-package io.github.archipelagominecraft.api.items
+package io.github.archipelagominecraft.core.api.items
 
-import io.github.archipelagominecraft.api.ArchipelagoType
-import io.github.archipelagominecraft.api.compat.Player
+import io.github.archipelagominecraft.core.api.ArchipelagoSlot
+import io.github.archipelagominecraft.core.api.ArchipelagoType
 
 
+//todo utility methods to store rewards like minecraft items given to the player, until they log-in
+// and manage multiple players
 /**
- * Represents an item type.
+ * Represents an Archipelago item type.
  *
- * Upon player connection, all registered item types will have their `prepareItem` method called to prepare the item data.
- * If the item has been received previously by any players, the `hasReceivedPreviously` parameter will contain a list of those players.
  *
- * This can be used to do things like make sure crafting recipes that were previously received are unlocked, and those
- * not yet received are locked.
- * (taking as an example a crafting recipe item type)
+ * An Archipelago item type can have a `dataCodec` which is used
+ * to serialize and deserialize the data associated with the item.
+ *
+ * Upon server startup, the `prepareItem` method will be called, the object given as a parameter can be used to check
+ * if any archipelago slot the server is responsible for has received the item
+ *
+ * The `onItemReceived` method will be called when a slot the server is responsible for receives the item,
+ * **even if no players are online**
  *
  * @param D The type of the data associated with the item.
  */
-interface ArchipelagoItemType<D>: ArchipelagoType<D> {
-    /**
-     * Called upon player login to prepare the item with the given data.
-     *
-     * @param hasReceivedPreviously A list of players who have received this item previously.
-     * @param itemData The data associated with the item.
-     */
-    fun prepareItemForPlayer(player: Player, hasReceivedPreviously: Boolean, itemData: D)
-
+interface ArchipelagoItemType<D> : ArchipelagoType<D> {
 
     /**
-     * Called upon world load to prepare the item with the given data.
-     *
-     * @param hasReceivedPreviously Indicates if the item has been received previously by any players.
-     * @param itemData The data associated with the item.
+     * Called upon server startup, allows the item type handler to query information about the item.
+     * @param archipelagoItemView An ArchipelagoItemView object, that allows checking
      */
-    fun prepareItemForWorld(hasReceivedPreviously: Boolean, itemData: D)
+    fun prepareItem(archipelagoItemView: ArchipelagoItemView, data: D)
 
-    /**
-     * Called when the item is received by a player.
-     *
-     * @param player The player who received the item.
-     * @param itemData The data associated with the item.
-     */
-    fun onItemReceived(player: Player,itemData: D)
+
 
 }

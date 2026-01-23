@@ -1,4 +1,4 @@
-package io.github.archipelagominecraft.api
+package io.github.archipelagominecraft.core.api
 
 import com.mojang.serialization.Codec
 

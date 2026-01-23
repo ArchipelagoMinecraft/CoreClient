@@ -1,6 +1,6 @@
-package io.github.archipelagominecraft.api.locations
+package io.github.archipelagominecraft.core.api.locations
 
-import io.github.archipelagominecraft.api.ArchipelagoType
+import io.github.archipelagominecraft.core.api.ArchipelagoType
 
 
 /**
@@ -11,15 +11,13 @@ import io.github.archipelagominecraft.api.ArchipelagoType
  * A location can have a `dataCodec` which is used
  * to serialize and deserialize the data associated with the location.
  *
- * Upon world load, all registered location types will have their `prepareLocation` method called for
- * each location of that type.
- *
- * This method is used to prepare the location data, for example, lock or unlock advancements, depending on
- * the location view state.
- * (If the player already checked the location, the corresponding advancement should be unlocked)
  *
  * @param D The type of the data associated with the location
  */
 interface ArchipelagoLocationType<D>: ArchipelagoType<D> {
+    /**
+     * Called on server startup, allows to prepare the location's status in game and provides an object to mark
+     * the location as checked, and to query its status
+     */
     fun prepareLocation(locationView: ArchipelagoLocationView, itemData: D)
 }

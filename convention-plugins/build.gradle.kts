@@ -1,3 +1,6 @@
+import org.gradle.internal.impldep.org.apache.maven.model.PluginConfiguration
+import org.gradle.kotlin.dsl.kotlin
+
 plugins{
     `kotlin-dsl`
     `maven-publish`
@@ -25,14 +28,11 @@ repositories{
     }
     maven("https://maven.kikugie.dev/releases")
     maven("https://maven.kikugie.dev/snapshots")
-    exclusiveContent {
-        // retrofuturagradle
-        forRepositories(
-            maven("https://nexus.gtnewhorizons.com/repository/public/")
-        )
-        filter {
-            includeGroupAndSubgroups("com.gtnewhorizons")
-            includeGroupAndSubgroups("com.gtnewhorizons.retrofuturagradle")
+    maven{
+        url = uri("https://nexus.gtnewhorizons.com/repository/public/")
+        mavenContent {
+            includeGroupByRegex("com\\.gtnewhorizons\\..+")
+            includeGroup("com.gtnewhorizons")
         }
     }
 }
@@ -63,7 +63,7 @@ dependencies{
     fun plugin(id: String, version: String) = "$id:$id.gradle.plugin:$version"
     implementation(plugin("com.google.devtools.ksp", "2.2.0-2.0.2"))
     implementation(plugin("dev.kikugie.fletching-table","0.1.0-alpha.15"))
-    implementation(plugin("dev.kikugie.stonecutter", "0.7.8"))
+    implementation(plugin("dev.kikugie.stonecutter", "0.7.11"))
     implementation(plugin("org.cthing.build-constants", "2.0.0"))
     implementation(plugin("me.modmuss50.mod-publish-plugin", "0.8.4"))
     implementation(plugin("org.jetbrains.kotlin.jvm", "2.2.0"))
@@ -78,7 +78,7 @@ dependencies{
     implementation(plugin("org.jetbrains.gradle.plugin.idea-ext","1.2"))
     implementation(plugin("org.jetbrains.kotlin.jvm", "2.2.0"))
     implementation(plugin("com.gradleup.shadow","8.3.6"))
-    implementation(plugin("com.gtnewhorizons.retrofuturagradle", "1.4.6"))
+    implementation(plugin("com.gtnewhorizons.retrofuturagradle", "2.0.2"))
 
     //settings plugins
     implementation(plugin("org.danilopianini.gradle-pre-commit-git-hooks", "2.0.28"))

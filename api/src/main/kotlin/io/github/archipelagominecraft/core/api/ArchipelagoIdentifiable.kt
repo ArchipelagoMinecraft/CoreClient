@@ -1,4 +1,4 @@
-package io.github.archipelagominecraft.api
+package io.github.archipelagominecraft.core.api
 interface ArchipelagoIdentifiable {
     val namespace: String
     val typeId: String

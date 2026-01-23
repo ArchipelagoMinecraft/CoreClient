@@ -4,12 +4,12 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import io.github.archipelagominecraft.api.ArchipelagoType
-import io.github.archipelagominecraft.api.items.ArchipelagoItemType
-import io.github.archipelagominecraft.api.locations.ArchipelagoLocationType
+import io.github.archipelagominecraft.core.api.ArchipelagoType
+import io.github.archipelagominecraft.core.api.items.ArchipelagoItemType
+import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationType
 
-data class ArchipelagoItemDefinition(
-    val handlers: List<ArchipelagoItemHandler<*, *>>
+internal data class ArchipelagoItemDefinition(
+    val handlers: List<ArchipelagoItemHandler<*, *>>,
 ) {
     companion object {
         fun codec(typeMap: Map<String, ArchipelagoItemType<*>>): Codec<ArchipelagoItemDefinition> =
@@ -23,15 +23,13 @@ data class ArchipelagoItemDefinition(
     }
 }
 
-data class ArchipelagoLocationDefinition(
-    val id: Int,
-    val handler: ArchipelagoLocationHandler<*, *>
+internal data class ArchipelagoLocationDefinition(
+    val handler: ArchipelagoLocationHandler<*, *>,
 ) {
     companion object {
         fun codec(typeMap: Map<String, ArchipelagoLocationType<*>>): Codec<ArchipelagoLocationDefinition> =
             RecordCodecBuilder.create { builder ->
                 builder.group(
-                    Codec.INT.fieldOf("id").forGetter { it.id },
                     ArchipelagoLocationHandler.codec(typeMap)
                         .fieldOf("handler")
                         .forGetter { it.handler }
@@ -41,7 +39,7 @@ data class ArchipelagoLocationDefinition(
 }
 
 
-abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
+internal abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
     abstract val type: T
     abstract val data: D
 
@@ -50,7 +48,7 @@ abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
         @JvmStatic
         protected fun <H : ArchipelagoHandler<*, *>> codec(
             typesMap: Map<String, ArchipelagoType<*>>,
-            makeHandler: (ArchipelagoType<*>, Any) -> H
+            makeHandler: (ArchipelagoType<*>, Any) -> H,
         ): MapCodec<H> =
             Codec.STRING.comapFlatMap({
                 if (typesMap.containsKey(it)) {
@@ -81,9 +79,9 @@ abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
 }
 
 
-data class ArchipelagoItemHandler<T : ArchipelagoItemType<D>, D>(
+internal data class ArchipelagoItemHandler<T : ArchipelagoItemType<D>, D>(
     override val type: T,
-    override val data: D
+    override val data: D,
 ) : ArchipelagoHandler<T, D>(
 ) {
     companion object {
@@ -97,7 +95,7 @@ data class ArchipelagoItemHandler<T : ArchipelagoItemType<D>, D>(
 
         private fun <T : ArchipelagoItemType<Any>> create(
             type: ArchipelagoType<*>,
-            data: Any
+            data: Any,
         ): ArchipelagoItemHandler<T, *> =
             @Suppress("UNCHECKED_CAST")
             ArchipelagoItemHandler(
@@ -106,9 +104,9 @@ data class ArchipelagoItemHandler<T : ArchipelagoItemType<D>, D>(
     }
 }
 
-data class ArchipelagoLocationHandler<T : ArchipelagoLocationType<D>, D>(
+internal data class ArchipelagoLocationHandler<T : ArchipelagoLocationType<D>, D>(
     override val type: T,
-    override val data: D
+    override val data: D,
 ) : ArchipelagoHandler<T, D>() {
     companion object {
         @JvmStatic
@@ -121,7 +119,7 @@ data class ArchipelagoLocationHandler<T : ArchipelagoLocationType<D>, D>(
 
         private fun <T : ArchipelagoLocationType<Any>> create(
             type: ArchipelagoType<*>,
-            data: Any
+            data: Any,
         ): ArchipelagoLocationHandler<T, *> =
             @Suppress("UNCHECKED_CAST")
             ArchipelagoLocationHandler(
@@ -130,25 +128,34 @@ data class ArchipelagoLocationHandler<T : ArchipelagoLocationType<D>, D>(
     }
 }
 
+private fun <T> Codec<String>.comapFlatMapID(constructor: (Int) -> T, getter: (T) -> Int) =
+    this.comapFlatMap({
+        it.toIntOrNull()?.let {
+            DataResult.success(constructor(it))
+        } ?: DataResult.error { "key '$it' is not an integer " }
+    }, {
+        getter(it).toString()
+    })
 
-data class ArchipelagoDefinitions(
-    val items: Map<Int, ArchipelagoItemDefinition>,
-    val locations: Map<Int, ArchipelagoLocationDefinition>
+
+internal data class ArchipelagoDefinitions(
+    val items: Map<APItemID, ArchipelagoItemDefinition>,
+    val locations: Map<APLocationID, ArchipelagoLocationDefinition>,
 ) {
     companion object {
         @JvmStatic
         fun codec(
             itemTypes: Map<String, ArchipelagoItemType<*>>,
-            locationTypes: Map<String, ArchipelagoLocationType<*>>
+            locationTypes: Map<String, ArchipelagoLocationType<*>>,
         ): Codec<ArchipelagoDefinitions> =
             RecordCodecBuilder.create { builder ->
                 builder.group(
                     Codec.unboundedMap(
-                        Codec.STRING.xmap({it.toInt()}) {it.toString()},
+                        Codec.STRING.comapFlatMapID(::APItemID) { it.value },
                         ArchipelagoItemDefinition.codec(itemTypes)
                     ).fieldOf("items").forGetter { it.items },
                     Codec.unboundedMap(
-                        Codec.STRING.xmap({it.toInt()}) {it.toString()},
+                        Codec.STRING.comapFlatMapID(::APLocationID) { it.value },
                         ArchipelagoLocationDefinition.codec(locationTypes)
                     ).fieldOf("locations").forGetter { it.locations }
                 ).apply(builder, ::ArchipelagoDefinitions)
