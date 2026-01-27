@@ -10,5 +10,8 @@
     "main": [
       "${mod_package}.loaders.fabric.FabricEntrypoint"
     ]
-  }
+  },
+  "mixins": [
+    "${mixins_file_prefix}.mixins.json"
+  ]
 }

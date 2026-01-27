@@ -2,9 +2,8 @@
 /*package io.github.archipelagominecraft.core.loaders.legacyforge
 
 import com.google.common.collect.ImmutableList
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin
 import io.github.archipelagominecraft.core.ArchipelagoClientConstants
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
-import zone.rong.mixinbooter.IEarlyMixinLoader
 
 // For MixinBooter
 class LegacyForgeCorePlugin : IFMLLoadingPlugin, IEarlyMixinLoader {

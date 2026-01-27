@@ -13,6 +13,7 @@ val defaultProperties = mapOf(
         "21.4.124",
         "1.21.4-20241203.161809",
         "0.119.3+1.21.4",
+        "2024.03.23",
         61,
         46,
         21
@@ -22,6 +23,7 @@ val defaultProperties = mapOf(
         "21.5.87",
         "1.21.5-20250325.162830",
         "0.128.1+1.21.5",
+        "2025.06.15",
         71,
         55,
         21
@@ -30,6 +32,7 @@ val defaultProperties = mapOf(
         "21.6.20-beta",
         "1.21.6-20250617.151856",
         "0.128.2+1.21.6",
+        "2025.06.29",
         80,
         63,
         21
@@ -38,6 +41,7 @@ val defaultProperties = mapOf(
         "21.7.25-beta",
         "1.21.7-20250711.194848",
         "0.129.0+1.21.7",
+        "2025.07.18",
         81,
         64,
         21
@@ -46,6 +50,7 @@ val defaultProperties = mapOf(
         "21.8.15",
         "1.21.8-20250717.133445",
         "0.129.0+1.21.8",
+        "2025.09.14",
         81,
         64,
         21
@@ -61,14 +66,14 @@ fun legacy(mcVersion: String,
            javaVersion: Int = 8,
            mappingsChannel: String = "stable"
 ): Pair<String,Map<String, String>> = mcVersion to mapOf(
+    Keys.pluginType to PluginTypes.RFG.propValue,
     Keys.minecraftVersion to mcVersion,
     Keys.forgeVersion to forgeVersion,
-    Keys.mappingsVersion to mappingsVersion.toString(),
+    Keys.mcpMappingsVersion to mappingsVersion.toString(),
+    Keys.mcpMappingsChannel to mappingsChannel,
     Keys.resourcePackFormat to resourcePackFormat.toString(),
     Keys.dataPackFormat to datapackFormat.toString(),
     Keys.javaVersion to javaVersion.toString(),
-    Keys.mappingsChannel to mappingsChannel,
-    Keys.dfuVersion to "4.1.27"
 )
 
 fun recent(
@@ -76,10 +81,12 @@ fun recent(
     neoforgeVersion: String,
     neoformVersion: String,
     fabricApiVersion: String,
+    parchmentVersion: String,
     datapackFormat: Int,
     resourcePackFormat: Int,
     javaVersion: Int = 17
 ) = mcVersion to mapOf(
+    Keys.pluginType to PluginTypes.MODSTITCH.propValue,
     Keys.minecraftVersion to mcVersion,
     Keys.neoforgeVersion to neoforgeVersion,
     Keys.neoformVersion to neoformVersion,
@@ -87,4 +94,5 @@ fun recent(
     Keys.resourcePackFormat to resourcePackFormat.toString(),
     Keys.dataPackFormat to datapackFormat.toString(),
     Keys.javaVersion to javaVersion.toString(),
+    Keys.parchmentMappingsVersion to parchmentVersion,
 )

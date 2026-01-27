@@ -1,0 +1,38 @@
+{
+  "items": {
+    "1": {
+      "handlers": [
+        {
+          "type": "apsample:sample_type",
+          "data": {
+            "value": "mysamplevalue"
+          }
+        }
+//        {
+//          "type": "apvanilla:crafting_recipes",
+//          "data": {
+//            "recipes": [
+//              "minecraft:chest"
+//            ]
+//          }
+//        },
+//        {
+//          "type": "apkubejs:celebration",
+//          "data": {
+//            "sound": "yippee"
+//          }
+//        }
+      ]
+    }
+  },
+  "locations": {
+//    "1": {
+//      "type": "apvanilla:advancement",
+//      "data": {
+//        "advancements": [
+//          "minecraft:adventure/shoot_arrow"
+//        ]
+//      }
+//    }
+  }
+}

@@ -2,7 +2,6 @@ package io.github.archipelagominecraft.core
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import com.mojang.serialization.JsonOps
 import io.github.archipelagominecraft.core.api.ArchipelagoMinecraftCoreRegistration
 import io.github.archipelagominecraft.core.api.ArchipelagoSlot
@@ -15,7 +14,7 @@ import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationView
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
 
-//json5 to allow comments, Gson
+//json5 to allow comments, Gson handles this
 const val DEFINITIONS_PATH = "../../../../definitions.json5"
 
 
@@ -30,6 +29,7 @@ internal object ArchipelagoMinecraftClientCore {
     @JvmStatic
     internal fun initialize() {
         LOGGER.info("Hello from ArchipelagoMinecraftClientCore!")
+
         //todo for sample purposes, they should be in the "provider" mod
         ArchipelagoMinecraftCoreRegistration.registerItemType(SampleArchipelagoItemType)
         ArchipelagoMinecraftCoreRegistration.registerLocationType(SampleArchipelagoLocationType)

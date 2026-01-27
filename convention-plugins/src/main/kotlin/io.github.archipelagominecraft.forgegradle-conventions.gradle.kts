@@ -2,13 +2,9 @@ import io.archipelagominecraft.gradle.*
 
 plugins {
     java
-    id("io.github.archipelagominecraft.common-conventions")
     id("com.gtnewhorizons.retrofuturagradle")
 }
 
-val dfuVersion = requiredProp(Keys.dfuVersion)
-val propMappingsChannel = requiredProp(Keys.mappingsChannel)
-val propMappingsVersion = requiredProp(Keys.mappingsVersion)
 
 //java.toolchain.languageVersion = JavaLanguageVersion.of(modInfo.javaVersion)
 //tasks.withType<JavaCompile>(){
@@ -171,33 +167,33 @@ tasks.getByName("processPatchedMcResources") {
     }
 }
 
-
-
-tasks.configureEach {
-    if (name == "kspMcLauncherKotlin") {
-        dependsOn("createMcLauncherFiles")
-        dependsOn("processPatchedMcResources")
-    }
-    if(name == "kspPatchedMcKotlin"){
-        dependsOn("decompressDecompiledSources")
-    }
-    if(name == "kspInjectedTagsKotlin"){
-        dependsOn("processPatchedMcResources")
-    }
-    if(name == "stonecutterMergeInjectedInterfaces"){
-        dependsOn("processInjectedInterfacesResources")
-    }
-    if(name == "compileInjectedInterfacesKotlin"){
-        dependsOn("stonecutterMergeInjectedInterfaces")
-    }
-    if(name == "stonecutterGenerateInjectedInterfaces"){
-        dependsOn("stonecutterMergeInjectedInterfaces")
-    }
-    if(name == "stonecutterMergeMcLauncher"){
-        dependsOn("processMcLauncherResources")
-    }
-    if(name == "stonecutterMergeMcLauncher"){
-        dependsOn("compileMcLauncherKotlin")
-    }
-}
+//
+//
+//tasks.configureEach {
+//    if (name == "kspMcLauncherKotlin") {
+//        dependsOn("createMcLauncherFiles")
+//        dependsOn("processPatchedMcResources")
+//    }
+//    if(name == "kspPatchedMcKotlin"){
+//        dependsOn("decompressDecompiledSources")
+//    }
+//    if(name == "kspInjectedTagsKotlin"){
+//        dependsOn("processPatchedMcResources")
+//    }
+//    if(name == "stonecutterMergeInjectedInterfaces"){
+//        dependsOn("processInjectedInterfacesResources")
+//    }
+//    if(name == "compileInjectedInterfacesKotlin"){
+//        dependsOn("stonecutterMergeInjectedInterfaces")
+//    }
+//    if(name == "stonecutterGenerateInjectedInterfaces"){
+//        dependsOn("stonecutterMergeInjectedInterfaces")
+//    }
+//    if(name == "stonecutterMergeMcLauncher"){
+//        dependsOn("processMcLauncherResources")
+//    }
+//    if(name == "stonecutterMergeMcLauncher"){
+//        dependsOn("compileMcLauncherKotlin")
+//    }
+//}
 

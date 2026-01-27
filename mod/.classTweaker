@@ -1,0 +1,5 @@
+accessWidener v1 named
+
+accessible field net/minecraft/world/level/storage/PrimaryLevelData worldOptions Lnet/minecraft/world/level/levelgen/WorldOptions;
+
+mutable field net/minecraft/world/level/storage/PrimaryLevelData worldOptions Lnet/minecraft/world/level/levelgen/WorldOptions;

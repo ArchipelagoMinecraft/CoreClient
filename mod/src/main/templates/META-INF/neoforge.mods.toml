@@ -19,3 +19,6 @@ license = "${mod_license}"
 [[dependencies.${mod_id}]]
     modId = "minecraft"
     type = "required"
+
+[[mixins]]
+    config = "${mixins_file_prefix}.mixins.json"

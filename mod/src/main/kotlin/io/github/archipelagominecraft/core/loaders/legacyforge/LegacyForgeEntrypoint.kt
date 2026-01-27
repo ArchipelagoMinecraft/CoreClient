@@ -1,13 +1,14 @@
 //? if <=1.12.2 {
 /*package io.github.archipelagominecraft.core.loaders.legacyforge
 
+import cpw.mods.fml.common.Mod
+import cpw.mods.fml.common.event.FMLPreInitializationEvent
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent
 import io.github.archipelagominecraft.core.ArchipelagoClientConstants
 import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore
 import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore.LOGGER
 import io.github.archipelagominecraft.core.loaders.forgeLike.ForgeLikeEntrypoint
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
-import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent
+
 
 @Mod(modid = ArchipelagoClientConstants.MOD_ID)
 class LegacyForgeEntrypoint {

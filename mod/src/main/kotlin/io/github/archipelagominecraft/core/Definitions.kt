@@ -54,11 +54,7 @@ internal abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
                 if (typesMap.containsKey(it)) {
                     DataResult.success(it)
                 } else {
-                    //? if <=1.12.2 {
-                    /*DataResult.error("Unknown type: $it")
-                    *///?} else {
                     DataResult.error { "Unknown type: $it" }
-                    //?}
                 }
             }) { it }.dispatchMap<H>({ it.type.id }) { b ->
                 @Suppress("UNCHECKED_CAST")
@@ -69,11 +65,7 @@ internal abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
                         { makeHandler(type, it) },
                         { it.data }
                     )
-                //? if <=1.12.2 {
-                /*xmap.codec()
-                *///?} else {
                 xmap
-                //?}
             }
     }
 }

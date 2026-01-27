@@ -1,6 +1,5 @@
 package io.github.archipelagominecraft.core.api.items
 
-import io.github.archipelagominecraft.core.api.ArchipelagoSlot
 import io.github.archipelagominecraft.core.api.ArchipelagoType
 
 
