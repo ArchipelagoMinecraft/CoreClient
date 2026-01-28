@@ -1,6 +1,6 @@
 {
   "required": true,
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "${mixin_compat_level}",
   "package": "io.github.archipelagominecraft.core.mixins",
   "mixins": [
     "SampleWorldGenMixin"

@@ -46,10 +46,4 @@ abstract class BuildMultiversionExtension @Inject constructor(objects: ObjectFac
      */
     abstract val forceJavaVersion: Property<Int>
 
-
-    /**
-     * Sets the mixin package (required for GTNHGradle)
-     */
-    abstract val mixinsPackage: Property<String>
-    //todo wire to modstitch maybe ?
 }

@@ -4,6 +4,7 @@ import Keys
 import com.gtnewhorizons.retrofuturagradle.MinecraftExtension
 import com.gtnewhorizons.retrofuturagradle.UserDevPlugin
 import com.gtnewhorizons.retrofuturagradle.mcp.DeobfuscateTask
+import com.gtnewhorizons.retrofuturagradle.mcp.ReobfuscatedJar
 import com.gtnewhorizons.retrofuturagradle.mcp.SharedMCPTasks
 import com.gtnewhorizons.retrofuturagradle.minecraft.RunMinecraftTask
 import com.gtnewhorizons.retrofuturagradle.modutils.ModUtils
@@ -31,11 +32,14 @@ import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.withType
 import org.gradle.language.jvm.tasks.ProcessResources
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
+import xyz.wagyourtail.jvmdg.gradle.task.DowngradeJar
+import xyz.wagyourtail.jvmdg.gradle.task.ShadeJar
 
 
 // https://github.com/CleanroomMC/TemplateDevEnvKt/blob/master/build.gradle.kts
@@ -49,7 +53,8 @@ fun retroFuturaGradleConfiguration(
     val propMappingsChannel = target.requiredProp(Keys.mcpMappingsChannel)
     val propMappingsVersion = target.requiredProp(Keys.mcpMappingsVersion)
     val modInfo = target.modInfo
-    val use_mixins = false
+    val use_mixins = target.findProperty("enable_mixin")?.toString()?.toBoolean() == true &&
+        !modInfo.mixinsFilePrefix.isNullOrBlank()
     val use_coremod = false
     val coremod_plugin_class_name = ""
     val use_access_transformer = false
@@ -69,6 +74,15 @@ fun retroFuturaGradleConfiguration(
     }
     target.tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
+    }
+
+    if(use_mixins){
+        target.repositories {
+            maven {
+                name = "SpongePowered Maven"
+                url = target.uri("https://repo.spongepowered.org/maven")
+            }
+        }
     }
 
 
@@ -133,6 +147,9 @@ fun retroFuturaGradleConfiguration(
 //        useDependencyAccessTransformers.set(true)
     }
     configureRuns(runs, target)
+    if (extension.enableJvmDowngrader.get()) {
+        configureDowngradedRuns(target)
+    }
 
 
 // Adds Access Transformer files to tasks
@@ -213,6 +230,26 @@ private fun configureRuns(
     }
 }
 
+private fun configureDowngradedRuns(target: Project) {
+    val downgradeJar = target.tasks.named("downgradeJar", DowngradeJar::class.java)
+
+    target.tasks.withType<ReobfuscatedJar>().matching { it.name == "reobfJar" }.configureEach {
+        inputJar.set(downgradeJar.flatMap { it.archiveFile })
+    }
+
+    target.tasks.withType<RunMinecraftTask>().configureEach {
+        val shadeDowngradedApi = target.tasks.named("shadeDowngradedApi", ShadeJar::class.java)
+        val jarTask = target.tasks.named("jar", Jar::class.java)
+        dependsOn(shadeDowngradedApi)
+        doFirst {
+            val downgraded = shadeDowngradedApi.get().archiveFile.get().asFile
+            require(downgraded.exists()) { "Downgraded jar does not exist: ${downgraded.absolutePath}" }
+            val originalClasspath = classpath.minus(jarTask.get().outputs.files)
+            classpath = target.files(downgraded).plus(originalClasspath)
+        }
+    }
+}
+
 private fun setupAccessTransformers(target: Project, archivesBaseName: String) {
     for (at in target.extensions.getByType<SourceSetContainer>().getByName("main").resources.files) {
         if (at.name.lowercase().endsWith("_at.cfg")) {
@@ -250,7 +287,7 @@ private fun setupResourcesProcessing(
         // This will ensure that this task is redone when the versions change
 
         // Replace various properties in mcmod.info and pack.mcmeta if applicable
-        filesMatching(arrayListOf("mcmod.info", "pack.mcmeta")) {
+        filesMatching(arrayListOf("mcmod.info", "pack.mcmeta", "**/*.mixins.json")) {
             expand(
                 properties
             )

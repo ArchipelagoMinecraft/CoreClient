@@ -81,6 +81,7 @@ val Project.replacementProperties: Map<String, String>
             put("data_pack_format", value.toString())
         }
         modInfo.mixinsFilePrefix?.let { put("mixins_file_prefix", it) }
+        put("mixin_compat_level", "JAVA_${modInfo.javaVersion}")
     }
 
 
@@ -95,4 +96,3 @@ fun Project.prop(
 }
 
 fun Project.requiredProp(property: String): String = prop(property) ?: error("The property $property is required")
-
