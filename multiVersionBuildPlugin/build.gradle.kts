@@ -66,6 +66,7 @@ publishing {
 dependencies{
     fun plugin(id: String, version: String) = "$id:$id.gradle.plugin:$version"
     implementation(plugin("com.google.devtools.ksp", "2.2.0-2.0.2"))
+    implementation(plugin("xyz.wagyourtail.jvmdowngrader", "1.3.5"))
 //    implementation(plugin("dev.kikugie.fletching-table","0.1.0-alpha.15"))
     implementation(plugin("dev.kikugie.stonecutter", "0.8.3"))
     implementation(plugin("org.cthing.build-constants", "2.0.0"))
@@ -82,8 +83,7 @@ dependencies{
     implementation(plugin("org.jetbrains.gradle.plugin.idea-ext","1.2"))
     implementation(plugin("org.jetbrains.kotlin.jvm", "2.2.0"))
     implementation(plugin("com.gradleup.shadow","9.3.1"))
-//    implementation(plugin("com.gtnewhorizons.retrofuturagradle", "2.0.2"))
-    implementation(plugin("com.gtnewhorizons.gtnhgradle", "2.0.18"))
+    implementation(plugin("com.gtnewhorizons.retrofuturagradle", "2.0.2"))
 
     //settings plugins
     implementation(plugin("org.danilopianini.gradle-pre-commit-git-hooks", "2.0.28"))

@@ -4,14 +4,15 @@ import Keys
 import ModLoaders
 import dev.isxander.modstitch.base.AppendModMetadataTask
 import dev.isxander.modstitch.base.extensions.ModstitchExtension
-import gradle.kotlin.dsl.accessors._1ffcea057cc3dd5dcbcecb169c9d0988.implementation
 import io.archipelagominecraft.gradle.modInfo
 import io.archipelagominecraft.gradle.replacementProperties
 import io.archipelagominecraft.gradle.requiredProp
 import io.github.archipelagominecraft.plugin.RunConfigurationData
 import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Project
+import org.gradle.api.internal.tasks.JvmConstants
 import org.gradle.api.provider.Provider
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.accessors.runtime.maybeRegister
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 fun modstitchConfiguration(
     target: Project,
+    javaVersion: Provider<Int>,
     loader: Provider<ModLoaders>,
     runs: NamedDomainObjectSet<RunConfigurationData>,
 ): SpecificPluginApplicationResult {
@@ -38,13 +40,15 @@ fun modstitchConfiguration(
     val modstitchModImplementation = target.configurations.named("modstitchModImplementation")
     target.extensions.configure<KotlinJvmExtension>() {
         @Suppress("UnstableApiUsage")
-        jvmToolchain(target.modInfo.javaVersion)
+        jvmToolchain {
+            languageVersion.set(javaVersion.map { JavaLanguageVersion.of(it) })
+        }
     }
     target.extensions.configure<ModstitchExtension>() {
 
         val modInfo = target.modInfo
         minecraftVersion.set(modInfo.minecraftVersion)
-        javaVersion.set(modInfo.javaVersion)
+        this.javaVersion.set(javaVersion)
 
         // This metadata is used to fill out the information inside
         // the metadata files found in the templates folder.
@@ -96,7 +100,7 @@ fun modstitchConfiguration(
                     // They are supposed to be added both as "implementation" and as "additionalRuntimeClasspath"
                     // Here we do this automatically
                     configurations.named("additionalRuntimeClasspath") {
-                        extendsFrom(configurations.implementation.get())
+                        extendsFrom(configurations.getByName(JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME))
                     }
                 }
             }

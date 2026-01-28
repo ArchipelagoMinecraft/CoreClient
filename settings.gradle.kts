@@ -1,5 +1,5 @@
 pluginManagement {
-    includeBuild("convention-plugins")
+    includeBuild("multiVersionBuildPlugin")
     repositories {
         mavenCentral()
         gradlePluginPortal()
@@ -39,7 +39,7 @@ val apiProject = ":api"
 val modProject = ":mod"
 
 val supportedVersions = listOf(
-//    "1.12.2",
+    "1.12.2",
 //    "1.21.4",
 //    "1.21.5",
 //    "1.21.6",

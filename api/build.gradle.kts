@@ -1,39 +1,16 @@
-import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import com.gtnewhorizons.retrofuturagradle.modutils.ModUtils
-import io.archipelagominecraft.gradle.pluginType
 
 plugins {
     kotlin("jvm")
     id("io.github.archipelagominecraft.build-multiversion-conventions")
-    id("com.gradleup.shadow")
+    id("backport-datafixerupper")
 }
 
 group = "io.github.archipelagominecraft"
 version = "0.1-SNAPSHOT"
 
-val shade by configurations.registering
 
-val wantsDfu = stonecutter.current.parsed <= "1.12.2"
-repositories {
-    if(wantsDfu) {
-        exclusiveContent {
-            forRepository {
-                maven("https://libraries.minecraft.net")
-            }
-            filter {
-                includeModule("com.mojang", "datafixerupper")
-            }
-        }
-    }
-}
-dependencies {
-    if(wantsDfu) {
-        val dfu = "com.mojang:datafixerupper:8.0.16"
-        shade(dfu)
-        api(dfu)
-    }
-}
+// https://github.com/GTNewHorizons/RetroFuturaGradle/issues/66
 configurations.runtimeElements {
     attributes {
         attribute(
@@ -41,23 +18,23 @@ configurations.runtimeElements {
             true
         )
     }
-}//todo remove
+}
+
+
 
 buildMultiversion {
-    enableJvmDowngrader = false
+    if(backportDfu.shouldBackport) {
+        enableJvmDowngrader = true
+    }
 }
 
-
-
-configurations.implementation {
-    extendsFrom(shade.get())
-}
-tasks.shadowJar {
-    configurations = listOf(shade.get())
-}
-
-repositories{
+repositories {
     mavenCentral()
+}
+dependencies {
+    if(backportDfu.shouldBackport){
+        downgradeImplementation(backportDfu.dfuDependency)
+    }
 }
 
 

@@ -4,4 +4,7 @@ import com.mojang.serialization.Codec
 
 interface ArchipelagoType<D> : ArchipelagoIdentifiable {
     val dataCodec : Codec<D>
+
 }
+
+

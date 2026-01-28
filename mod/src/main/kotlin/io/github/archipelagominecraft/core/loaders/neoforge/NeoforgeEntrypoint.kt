@@ -1,5 +1,5 @@
 //? if neoforge {
-package io.github.archipelagominecraft.core.loaders.neoforge
+/*package io.github.archipelagominecraft.core.loaders.neoforge
 
 import io.github.archipelagominecraft.core.ArchipelagoClientConstants
 import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore
@@ -18,4 +18,4 @@ class NeoforgeEntrypoint(modBus: IEventBus) {
         NeoForge.EVENT_BUS.addListener<ServerAboutToStartEvent> { e -> ForgeLikeEntrypoint.serverAboutToStart() }
     }
 
-} //?}
+} *///?}

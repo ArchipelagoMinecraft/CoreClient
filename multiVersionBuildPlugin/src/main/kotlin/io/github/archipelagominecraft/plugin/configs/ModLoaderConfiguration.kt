@@ -21,6 +21,7 @@ data class SpecificPluginApplicationResult(
 fun modLoaderConfiguration(
     project: Project,
     extension: BuildMultiversionExtension,
+    javaVersion: Provider<Int>,
     modInfo: Provider<ModInfo>,
     loader: Provider<ModLoaders>,
     pluginType: Provider<PluginTypes>,
@@ -28,10 +29,10 @@ fun modLoaderConfiguration(
 ): SpecificPluginApplicationResult {
 
     return when (pluginType.get()) {
-        PluginTypes.RFG -> gtnhGradleConfiguration(project,extension,runs)
+        PluginTypes.RFG -> retroFuturaGradleConfiguration(project,javaVersion,extension,runs)
 
 
-        PluginTypes.MODSTITCH -> modstitchConfiguration(project, loader,runs)
+        PluginTypes.MODSTITCH -> modstitchConfiguration(project, javaVersion,loader,runs)
     }
 }
 

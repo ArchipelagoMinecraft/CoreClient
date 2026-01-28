@@ -1,6 +1,5 @@
 package io.github.archipelagominecraft.core
 
-import org.slf4j.LoggerFactory
 
 internal interface Logger{
     fun info(message: String)
@@ -16,7 +15,7 @@ internal object LogManager {
     @JvmStatic
     fun getLogger(name: String): Logger {
         //? if <=1.12.2 {
-        /*val logger = org.apache.logging.log4j.LogManager.getLogger(name)
+        val logger = org.apache.logging.log4j.LogManager.getLogger(name)
         return object : Logger {
             override fun info(message: String) {
                 logger.info(message)
@@ -30,8 +29,8 @@ internal object LogManager {
                 logger.error(message)
             }
         }
-        *///?} else {
-            val logger = LoggerFactory.getLogger(name)
+        //?} else {
+            /*val logger = org.slf4j.LoggerFactory.getLogger(name)
             return object : Logger {
                 override fun info(message: String) {
                     logger.info(message)
@@ -45,7 +44,7 @@ internal object LogManager {
                     logger.error(message)
                 }
             }
-        //?}
+        *///?}
     }
 }
 

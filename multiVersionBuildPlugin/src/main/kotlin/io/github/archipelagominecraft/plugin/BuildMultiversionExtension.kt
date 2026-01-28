@@ -39,6 +39,14 @@ abstract class BuildMultiversionExtension @Inject constructor(objects: ObjectFac
         enableJvmDowngrader.convention(true)
     }
 
+
+    /**
+     * Force Java version regardless of minecraft's supported java version
+     * For use with enableJvmDowngrader
+     */
+    abstract val forceJavaVersion: Property<Int>
+
+
     /**
      * Sets the mixin package (required for GTNHGradle)
      */

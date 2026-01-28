@@ -36,6 +36,7 @@ fun commonConfiguration(target: Project) {
             .kotlin
             .srcDirs(generateBuildConstants)
     }
+
 }
 
 private fun configureStonecutter(target: Project, loader: ModLoaders) {
