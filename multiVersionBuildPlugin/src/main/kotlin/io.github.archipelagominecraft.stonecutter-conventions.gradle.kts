@@ -1,6 +1,5 @@
 import dev.kikugie.stonecutter.controller.StonecutterControllerExtension
 import kotlinx.serialization.json.Json
-import org.gradle.kotlin.dsl.register
 import org.jetbrains.gradle.ext.runConfigurations
 import org.jetbrains.gradle.ext.settings
 

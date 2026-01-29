@@ -2,13 +2,12 @@ package io.github.archipelagominecraft.plugin.configs
 
 import ModLoaders
 import PluginTypes
-import io.archipelagominecraft.gradle.*
-import io.github.archipelagominecraft.plugin.BuildMultiversionExtension
 import io.github.archipelagominecraft.plugin.RunConfigurationData
 import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.extra
 
 
 data class SpecificPluginApplicationResult(
@@ -20,19 +19,30 @@ data class SpecificPluginApplicationResult(
  */
 fun modLoaderConfiguration(
     project: Project,
-    extension: BuildMultiversionExtension,
     javaVersion: Provider<Int>,
-    modInfo: Provider<ModInfo>,
     loader: Provider<ModLoaders>,
     pluginType: Provider<PluginTypes>,
     runs: NamedDomainObjectSet<RunConfigurationData>,
-): SpecificPluginApplicationResult {
+) {
 
-    return when (pluginType.get()) {
-        PluginTypes.RFG -> retroFuturaGradleConfiguration(project,javaVersion,extension,runs)
-
-
-        PluginTypes.MODSTITCH -> modstitchConfiguration(project, javaVersion,loader,runs)
+    when (pluginType.get()) {
+        PluginTypes.RFG -> {
+            retroFuturaGradleConfiguration(project)
+        }
+        else -> {
+            project.extra["modstitch.platform"] = when (loader.get()) {
+                ModLoaders.NEOFORGE -> "moddevgradle"
+                ModLoaders.FORGE -> "moddevgradle-legacy"
+                ModLoaders.FABRIC -> "fabric-loom-remap"
+                ModLoaders.NONE_VANILLA -> "moddevgradle"
+            }
+            project.pluginManager.apply {
+                apply("dev.isxander.modstitch.base")
+            }
+        }
     }
+
+    modstitchConfiguration(project, javaVersion,loader,runs)
+
 }
 

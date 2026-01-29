@@ -12,13 +12,10 @@ import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.JvmConstants
 import org.gradle.api.provider.Provider
-import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.accessors.runtime.maybeRegister
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 
 fun modstitchConfiguration(
     target: Project,
@@ -28,22 +25,13 @@ fun modstitchConfiguration(
 ): SpecificPluginApplicationResult {
     // We need to convert the loader into the correct modstitch platform property, **before** applying the
     // modstitch plugin
-    target.project.extra["modstitch.platform"] = when (loader.get()) {
-        ModLoaders.NEOFORGE -> "moddevgradle"
-        ModLoaders.FORGE -> "moddevgradle-legacy"
-        ModLoaders.FABRIC -> "fabric-loom-remap"
-        ModLoaders.NONE_VANILLA -> "moddevgradle"
-    }
-    target.pluginManager.apply {
-        apply("dev.isxander.modstitch.base")
-    }
     val modstitchModImplementation = target.configurations.named("modstitchModImplementation")
-    target.extensions.configure<KotlinJvmExtension>() {
-        @Suppress("UnstableApiUsage")
-        jvmToolchain {
-            languageVersion.set(javaVersion.map { JavaLanguageVersion.of(it) })
-        }
-    }
+//    target.extensions.configure<KotlinJvmExtension>() {
+//        @Suppress("UnstableApiUsage")
+//        jvmToolchain {
+//            languageVersion.set(javaVersion.map { JavaLanguageVersion.of(it) })
+//        }
+//    }
     target.extensions.configure<ModstitchExtension>() {
 
         val modInfo = target.modInfo
@@ -77,14 +65,27 @@ fun modstitchConfiguration(
         moddevgradle {
             // If vanilla, we use neoform, else we use moddevgradle or legacy forgegradle
             if (loader.get() == ModLoaders.NONE_VANILLA) {
-                target.requiredProp(Keys.neoformVersion).let { neoFormVersion.set(it) }
+                neoFormVersion.set(target.requiredProp(Keys.neoformVersion))
             } else {
                 if (isModDevGradleRegular)
-                    target.requiredProp(Keys.neoforgeVersion).let { neoForgeVersion.set(it) }
+                    neoForgeVersion.set(target.requiredProp(Keys.neoforgeVersion))
                 if (isModDevGradleLegacy) {
-                    target.requiredProp(Keys.forgeVersion).let { forgeVersion.set(it) }
-                    target.requiredProp(Keys.mcpVersion).let { mcpVersion.set(it) }
+                    forgeVersion.set(target.requiredProp(Keys.forgeVersion))
+                    mcpVersion.set(target.requiredProp(Keys.mcpVersion))
                 }
+            }
+        }
+        target.retroFuturaGradle {
+            forgeVersion.set(target.requiredProp(Keys.forgeVersion))
+            mcpVersion.set(target.requiredProp(Keys.mcpVersion))
+            mcpChannel.set(target.requiredProp(Keys.mcpChannel))
+            if (loader.get() != ModLoaders.NONE_VANILLA) {
+                usesForge.set(true)
+                usesFML.set(true)
+            } else {
+                usesForge.set(true)
+                //required for launcher
+                usesFML.set(true)
             }
         }
 
@@ -105,9 +106,23 @@ fun modstitchConfiguration(
                 }
             }
         }
+        if (loader.get() == ModLoaders.NEOFORGE) {
+            target.dependencies {
+                components {
+                    withModule("net.neoforged:minecraft-dependencies") {
+                        allVariants {
+                            withDependencyConstraints {
+                                removeIf { it.group == "org.ow2.asm" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         target.dependencies {
             loom {
-                modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:${target.requiredProp(Keys.fabricApiVersion)}")
+                val requiredProp = target.requiredProp(Keys.fabricApiVersion).get()
+                modstitchModImplementation("net.fabricmc.fabric-api:fabric-api:$requiredProp")
             }
         }
     }

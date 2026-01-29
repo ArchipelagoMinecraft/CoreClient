@@ -3,6 +3,10 @@
   "compatibilityLevel": "${mixin_compat_level}",
   "package": "io.github.archipelagominecraft.core.mixins",
   "mixins": [
-    "SampleWorldGenMixin"
+    //? if <=1.12.2 {
+    /*"ForceSeedMixinLegacy"
+    *///?} else {
+    "ForceSeedMixin"
+    //?}
   ]
 }

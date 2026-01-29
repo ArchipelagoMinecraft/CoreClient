@@ -1,4 +1,3 @@
-import org.gradle.internal.impldep.org.apache.maven.model.PluginConfiguration
 import org.gradle.kotlin.dsl.kotlin
 
 plugins{
@@ -10,7 +9,6 @@ plugins{
 group = "io.github.archipelagominecraft"
 version = "1.0.1-SNAPSHOT"
 
-@Suppress("UnstableApiUsage")
 repositories{
     mavenCentral()
     gradlePluginPortal()
@@ -18,14 +16,6 @@ repositories{
     maven("https://maven.neoforged.net/releases")
     maven("https://maven.minecraftforge.net/")
     maven("https://maven.isxander.dev/releases/")
-    exclusiveContent {
-        forRepositories(
-            maven("https://repo.spongepowered.org/maven")
-        )
-        filter{
-            includeGroupAndSubgroups("org.spongepowered")
-        }
-    }
     maven("https://maven.kikugie.dev/releases")
     maven("https://maven.kikugie.dev/snapshots")
     maven{
@@ -67,7 +57,7 @@ dependencies{
     fun plugin(id: String, version: String) = "$id:$id.gradle.plugin:$version"
     implementation(plugin("com.google.devtools.ksp", "2.2.0-2.0.2"))
     implementation(plugin("xyz.wagyourtail.jvmdowngrader", "1.3.5"))
-//    implementation(plugin("dev.kikugie.fletching-table","0.1.0-alpha.15"))
+    implementation(plugin("dev.kikugie.fletching-table","0.1.0-alpha.22"))
     implementation(plugin("dev.kikugie.stonecutter", "0.8.3"))
     implementation(plugin("org.cthing.build-constants", "2.0.0"))
     implementation(plugin("me.modmuss50.mod-publish-plugin", "0.8.4"))
@@ -78,12 +68,12 @@ dependencies{
     implementation(plugin("net.neoforged.moddev", "2.0.80"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation(plugin( "org.cthing.build-constants","2.0.0"))
-    implementation("net.minecraftforge.gradle","ForgeGradle", "6.0+")
-    implementation(plugin("org.spongepowered.mixin", "0.7-SNAPSHOT"))
     implementation(plugin("org.jetbrains.gradle.plugin.idea-ext","1.2"))
     implementation(plugin("org.jetbrains.kotlin.jvm", "2.2.0"))
     implementation(plugin("com.gradleup.shadow","9.3.1"))
     implementation(plugin("com.gtnewhorizons.retrofuturagradle", "2.0.2"))
+
+    implementation("net.neoforged:srgutils:1.0.11")
 
     //settings plugins
     implementation(plugin("org.danilopianini.gradle-pre-commit-git-hooks", "2.0.28"))

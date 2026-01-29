@@ -41,9 +41,9 @@ fun interface ArchipelagoItemReceivedListener {
  * This method makes sense for archipelago item types
  * that are not player-based, like allowing some mob to spawn for example
  */
-fun ArchipelagoItemView.hasAnySlotReceivedItem(): Boolean =
-    ArchipelagoMinecraftCoreRegistration.serverManagedSlots.any {
-        this.hasSlotReceivedItem(it)
+fun ArchipelagoMinecraftCoreRegistration.hasAnySlotReceivedItem(itemView: ArchipelagoItemView): Boolean =
+    serverManagedSlots.any {
+        itemView.hasSlotReceivedItem(it)
     }
 
 

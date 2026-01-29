@@ -17,11 +17,22 @@ import kotlin.jvm.optionals.getOrNull
 //json5 to allow comments, Gson handles this
 const val DEFINITIONS_PATH = "../../../../definitions.json5"
 
+val ArchipelagoMinecraftCoreRegistration: ArchipelagoMinecraftCoreRegistration
+    get() {
+        return ArchipelagoMinecraftClientCore.registration
+            ?: error("ArchipelagoMinecraftClientCore has not been initialized yet, try registering a bit later")
+    }
+
 
 internal object ArchipelagoMinecraftClientCore {
     @JvmField
     internal val LOGGER: Logger = LogManager.getLogger(ArchipelagoClientConstants.MOD_NAME)
 
+    internal var registration: ArchipelagoCoreRegistrationImpl? = null
+
+    private val serverSlot: ArchipelagoSlot = object : ArchipelagoSlot {
+        override val isServerwideSlot: Boolean = true
+    }
 
     /**
      * Called as soon as possible, when the mod is initialized
@@ -29,6 +40,12 @@ internal object ArchipelagoMinecraftClientCore {
     @JvmStatic
     internal fun initialize() {
         LOGGER.info("Hello from ArchipelagoMinecraftClientCore!")
+        registration = ArchipelagoCoreRegistrationImpl(
+            setOf(serverSlot),
+            { emptySet() },
+            { serverSlot }
+        )
+
 
         //todo for sample purposes, they should be in the "provider" mod
         ArchipelagoMinecraftCoreRegistration.registerItemType(SampleArchipelagoItemType)
@@ -41,9 +58,10 @@ internal object ArchipelagoMinecraftClientCore {
      */
     @JvmStatic
     internal fun afterRegistration() {
-        val locationTypes = ArchipelagoMinecraftCoreRegistration.locationTypes
-        val itemTypes = ArchipelagoMinecraftCoreRegistration.itemTypes
-        val randomizerFeatures = ArchipelagoMinecraftCoreRegistration.randomizerFeatures
+        val registration = registration ?: error("afterRegistration was called before initialize")
+        val locationTypes = registration.locationTypes
+        val itemTypes = registration.itemTypes
+        val randomizerFeatures = registration.randomizerFeatures
 
         LOGGER.info("All location types have been registered (${locationTypes.size}) : $locationTypes")
         LOGGER.info("All item types have been registered (${itemTypes.size}): $itemTypes")
@@ -74,18 +92,9 @@ internal object ArchipelagoMinecraftClientCore {
         LOGGER.info("All definitions have been registered")
         LOGGER.info("Running with ${definitions.items.size} items and ${definitions.locations.size} locations.")
 
-        //todo quick mock of an actual client
-        val serverslot = object : ArchipelagoSlot {
-            override val isServerwideSlot: Boolean = true
-        }
-        ArchipelagoMinecraftCoreRegistration.internalRegisterPlayerSlots(
-            { serverslot },
-            { emptySet() }, //todo actually look up all connected players (for the server-as-slot case)
-            setOf(serverslot)
-        )
 
         val client: ArchipelagoClient = object : ArchipelagoClient {
-            override val managedSlots: Set<ArchipelagoSlot> = setOf(serverslot)
+            override val managedSlots: Set<ArchipelagoSlot> = setOf(serverSlot)
 
             override fun isLocationCheckedForSlot(
                 slot: ArchipelagoSlot,

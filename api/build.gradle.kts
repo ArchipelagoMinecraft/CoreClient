@@ -1,4 +1,5 @@
 import com.gtnewhorizons.retrofuturagradle.modutils.ModUtils
+import io.github.archipelagominecraft.plugin.configs.retroFuturaGradle
 
 plugins {
     kotlin("jvm")
@@ -11,20 +12,22 @@ version = "0.1-SNAPSHOT"
 
 
 // https://github.com/GTNewHorizons/RetroFuturaGradle/issues/66
-configurations.runtimeElements {
-    attributes {
-        attribute(
-            ModUtils.DEOBFUSCATOR_TRANSFORMED,
-            true
-        )
+retroFuturaGradle {
+    configurations.runtimeElements {
+        attributes {
+            attribute(
+                ModUtils.DEOBFUSCATOR_TRANSFORMED,
+                true
+            )
+        }
     }
 }
 
-
-
-buildMultiversion {
-    if(backportDfu.shouldBackport) {
-        enableJvmDowngrader = true
+modstitch {
+    retroFuturaGradle {
+        if(backportDfu.shouldBackport){
+            enableJvmDowngrader = true
+        }
     }
 }
 
@@ -33,7 +36,11 @@ repositories {
 }
 dependencies {
     if(backportDfu.shouldBackport){
-        downgradeImplementation(backportDfu.dfuDependency)
+        //todo find a way to make it work without quotes
+        // here it can't because the configuration does't exist when neoforge or fabric are loaded
+        backportDfu.dfuDependencies.forEach {
+            "modstitchDowngradeImplementation"(it)
+        }
     }
 }
 

@@ -1,8 +1,8 @@
 package io.github.archipelagominecraft.plugin.configs
 
 import ModLoaders
-import dev.isxander.modstitch.base.extensions.ModstitchExtension
-import dev.isxander.modstitch.util.Side
+import dev.kikugie.fletching_table.FletchingTablePlugin
+import dev.kikugie.fletching_table.extension.FletchingTableExtension
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import io.archipelagominecraft.gradle.loader
 import io.archipelagominecraft.gradle.modInfo
@@ -11,7 +11,6 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 
 
@@ -21,6 +20,7 @@ fun commonConfiguration(target: Project) {
     }
     val loader = target.loader
     configureStonecutter(target, loader)
+    configureFletchingTable(target)
 
     //todo use gradle providers for loader
     val modInfo = target.modInfo
@@ -51,5 +51,15 @@ private fun configureStonecutter(target: Project, loader: ModLoaders) {
         constants["neoforge"] = loader == ModLoaders.NEOFORGE
         constants["forge"] = loader == ModLoaders.FORGE
         constants["forgeLike"] = loader == ModLoaders.FORGE || loader == ModLoaders.NEOFORGE
+    }
+}
+
+private fun configureFletchingTable(target: Project) {
+    target.pluginManager.apply(FletchingTablePlugin::class.java)
+    target.extensions.configure<FletchingTableExtension>{
+        j52j.register(SourceSet.MAIN_SOURCE_SET_NAME){
+            extension("json","*.mixins.json5")
+            extension("info","mcmod.json5")
+        }
     }
 }

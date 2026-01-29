@@ -7,6 +7,7 @@ import defaultProperties
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 
 
@@ -30,20 +31,20 @@ data class ModInfo(
 
 val Project.modInfo: ModInfo
     get() = ModInfo(
-        minecraftVersion = requiredProp(Keys.minecraftVersion),
-        id = requiredProp("mod.id"),
-        name = requiredProp("mod.name"),
-        packageName = requiredProp("mod.package"),
-        version = requiredProp("mod.version"),
-        license = prop("mod.license"),
-        homepage = prop("mod.homepage"),
-        description = prop("mod.description"),
-        authors = requiredProp("mod.authors").split(",").map { it.trim() },
-        issueTracker = prop("mod.issue_tracker"),
-        resourcePackFormat = prop(Keys.resourcePackFormat)?.toInt(),
-        dataPackFormat = prop(Keys.dataPackFormat)?.toInt(),
-        mixinsFilePrefix = prop("mod.mixins_file_prefix"),
-        javaVersion = requiredProp(Keys.javaVersion).toInt(),
+        minecraftVersion = requiredProp(Keys.minecraftVersion).get(),
+        id = requiredProp("mod.id").get(),
+        name = requiredProp("mod.name").get(),
+        packageName = requiredProp("mod.package").get(),
+        version = requiredProp("mod.version").get(),
+        license = prop("mod.license").get(),
+        homepage = prop("mod.homepage").get(),
+        description = prop("mod.description").get(),
+        authors = requiredProp("mod.authors").get().split(",").map { it.trim() },
+        issueTracker = prop("mod.issue_tracker").get(),
+        resourcePackFormat = prop(Keys.resourcePackFormat).get()?.toInt(),
+        dataPackFormat = prop(Keys.dataPackFormat).get()?.toInt(),
+        mixinsFilePrefix = prop("mod.mixins_file_prefix").get(),
+        javaVersion = requiredProp(Keys.javaVersion).get().toInt(),
         project = this,
     )
 
@@ -53,22 +54,20 @@ internal val Project.stonecutter: StonecutterBuildExtension
 val Project.loader: ModLoaders
     get() = stonecutter.current.project.reversed().split("-", limit = 2)[0].reversed()
         .let(ModLoaders::parse)
-val Project.pluginType: PluginTypes
-    get() = requiredProp(Keys.pluginType).let(PluginTypes::parse)
 
 val Project.replacementProperties: Map<String, String>
     get() = buildMap {
         put("mod_id", modInfo.id)
-        put("mod_package", requiredProp("mod.package"))
-        put("mod_name", requiredProp("mod.name"))
-        put("mod_version", requiredProp("mod.version"))
-        put("mod_license", requiredProp("mod.license"))
-        put("mod_homepage", requiredProp("mod.homepage"))
-        put("mod_description", requiredProp("mod.description"))
-        val authors = requiredProp("mod.authors")
+        put("mod_package", requiredProp("mod.package").get())
+        put("mod_name", requiredProp("mod.name").get())
+        put("mod_version", requiredProp("mod.version").get())
+        put("mod_license", requiredProp("mod.license").get())
+        put("mod_homepage", requiredProp("mod.homepage").get())
+        put("mod_description", requiredProp("mod.description").get())
+        val authors = requiredProp("mod.authors").get()
         put("mod_authors", authors)
         put("mod_authors_json_list", Json.encodeToString(authors.split(",")))
-        put("mod_issue_tracker", requiredProp("mod.issue_tracker"))
+        put("mod_issue_tracker", requiredProp("mod.issue_tracker").get())
 
         if (stonecutter.eval(stonecutter.current.version, ">=1.6.1")) {
             val value =
@@ -87,12 +86,13 @@ val Project.replacementProperties: Map<String, String>
 
 fun Project.prop(
     property: String,
-): String? {
+): Provider<String> {
     project.findProperty(property) ?: defaultProperties[stonecutter.current.version]?.get(property)
 
     val versionedProps = defaultProperties[stonecutter.current.version]
-    return project.findProperty(property)?.toString()
-        ?: versionedProps?.get(property)
+    val findProvider = provider {project.findProperty(property) as String?}
+    val defaultProvider = provider {versionedProps?.get(property)}
+    return findProvider.orElse(defaultProvider)
 }
 
-fun Project.requiredProp(property: String): String = prop(property) ?: error("The property $property is required")
+fun Project.requiredProp(property: String): Provider<String> = prop(property)

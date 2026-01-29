@@ -15,9 +15,8 @@ object Keys {
     val minecraftVersion: String = dep("minecraft")
     val forgeVersion: String = dep("forge")
 
-    val mcpMappingsChannel: String = dep("mappings.channel")
-    val mcpMappingsVersion: String = dep("mappings.version")
-    val pluginType: String = dep("is_legacy")
+    val mcpChannel: String = dep("mappings.channel")
+    val pluginType: String = dep("plugin_type")
 }
 
 

@@ -30,20 +30,5 @@ abstract class BuildMultiversionExtension @Inject constructor(objects: ObjectFac
 
     abstract val versionPropertiesFolder: DirectoryProperty
 
-    /**
-     * Enables JVMDowngrader when running with GTNHGradle
-     */
-    abstract val enableJvmDowngrader: Property<Boolean>
-
-    init {
-        enableJvmDowngrader.convention(true)
-    }
-
-
-    /**
-     * Force Java version regardless of minecraft's supported java version
-     * For use with enableJvmDowngrader
-     */
-    abstract val forceJavaVersion: Property<Int>
 
 }

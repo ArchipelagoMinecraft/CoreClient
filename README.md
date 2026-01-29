@@ -15,6 +15,14 @@ See the [KubeJS Archipelago](https://github.com/ArchipelagoMinecraft/KubeJSArchi
 
 ## Maven Dependency
 
-Requires MixinBooter(https://github.com/CleanroomMC/MixinBooter) for 1.12.2
+Requirements: 
+1.7.10 : unimixins-all https://github.com/LegacyModdingMC/UniMixins
+1.8.9 : mixinbooter https://github.com/CleanroomMC/MixinBooter/
+1.12.2 : mixinbooter https://github.com/CleanroomMC/MixinBooter/
+
+
+Also https://github.com/eigenraven/MinecraftDev is nice to have for <=1.12.2 IDE support
+
+Important: run the "Reset active project" gradle task before committing!
 
 TODO

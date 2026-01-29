@@ -6,21 +6,9 @@ plugins {
 
 class DataFixerUpperExtension(
     val shouldBackport: Boolean,
-    val dfuDependency: Dependency,
+    val dfuDependencies: List<Dependency>,
 )
 
-//configurations {
-//    downgrade
-//    implementation.extendsFrom downgrade
-//}
-//
-//jvmdg.dg(configurations.downgrade) {
-//    downgradeTo = JavaVersion.VERSION_1_8 // default
-//}
-//
-//dependencies {
-//    downgrade "newer.java:version:1.0"
-//}
 
 extensions.configure<StonecutterBuildExtension> {
 
@@ -39,7 +27,6 @@ extensions.configure<StonecutterBuildExtension> {
                     includeModule("com.mojang", "datafixerupper")
                 }
                 metadataSources {
-//                    mavenPom()
                     artifact()
                 }
             }
@@ -49,7 +36,12 @@ extensions.configure<StonecutterBuildExtension> {
         "backportDfu",
         DataFixerUpperExtension(
             shouldBackPort,
-            project.dependencies.create("com.mojang:datafixerupper:8.0.16")
+            listOf(
+                "com.mojang:datafixerupper:8.0.16",
+                "it.unimi.dsi:fastutil:8.5.12"
+            ).map {
+                project.dependencies.create(it)
+            }
         )
     )
 }

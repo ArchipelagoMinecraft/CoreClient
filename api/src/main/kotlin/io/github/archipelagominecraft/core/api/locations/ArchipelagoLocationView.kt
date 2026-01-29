@@ -29,7 +29,7 @@ interface ArchipelagoLocationView {
 /**
  * Returns if the location has been checked for any slot the server is responsible for
  */
-fun ArchipelagoLocationView.isCheckedForAnySlot(): Boolean =
-    ArchipelagoMinecraftCoreRegistration.serverManagedSlots.any {
-        isCheckedFor(it)
+fun ArchipelagoMinecraftCoreRegistration.isCheckedForAnySlot(locationView: ArchipelagoLocationView): Boolean =
+    serverManagedSlots.any {
+       locationView.isCheckedFor(it)
     }

@@ -2,7 +2,6 @@ package io.github.archipelagominecraft.core
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import io.github.archipelagominecraft.core.api.ArchipelagoMinecraftCoreRegistration
 import io.github.archipelagominecraft.core.api.compat.Player
 import io.github.archipelagominecraft.core.api.features.ArchipelagoRandomizerFeature
 import io.github.archipelagominecraft.core.api.features.ArchipelagoRandomizerFeatureView
@@ -28,7 +27,7 @@ object SampleArchipelagoItemType : ArchipelagoItemType<SampleArchipelagoItemType
     }
 
     override fun prepareItem(archipelagoItemView: ArchipelagoItemView, data: SampleData) {
-        LOGGER.info("Sample item preparation, was unlocked by someone: ${archipelagoItemView.hasAnySlotReceivedItem()}")
+        LOGGER.info("Sample item preparation, was unlocked by someone: ${ArchipelagoMinecraftCoreRegistration.hasAnySlotReceivedItem(archipelagoItemView)}")
         val map = ArchipelagoMinecraftCoreRegistration.serverManagedSlots.map {
             it to archipelagoItemView.hasSlotReceivedItem(it)
         }
@@ -87,7 +86,7 @@ object SampleArchipelagoLocationType: ArchipelagoLocationType<SampleArchipelagoL
         locationView: ArchipelagoLocationView,
         itemData: Data,
     ) {
-        LOGGER.info("Sample location preparation, was unlocked by someone: ${locationView.isCheckedForAnySlot()}")
+        LOGGER.info("Sample location preparation, was unlocked by someone: ${ArchipelagoMinecraftCoreRegistration.isCheckedForAnySlot(locationView)}")
         val map = ArchipelagoMinecraftCoreRegistration.serverManagedSlots.map {
             it to locationView.isCheckedFor(it)
         }

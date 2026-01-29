@@ -22,6 +22,7 @@ pluginManagement {
             forRepositories(
                 maven("https://nexus.gtnewhorizons.com/repository/public/")
             )
+            @Suppress("UnstableApiUsage")
             filter {
                 includeGroupAndSubgroups("com.gtnewhorizons")
                 includeGroupAndSubgroups("com.gtnewhorizons.retrofuturagradle")
@@ -39,6 +40,7 @@ val apiProject = ":api"
 val modProject = ":mod"
 
 val supportedVersions = listOf(
+    "1.7.10",
     "1.12.2",
 //    "1.21.4",
 //    "1.21.5",
@@ -55,7 +57,7 @@ stonecutter {
                 if (stonecutter.eval(it, "<=1.12.2"))
                     mc(it,ModLoaders.FORGE)
                 else
-                    mc(it, ModLoaders.NEOFORGE,ModLoaders.FABRIC)
+                    mc(it, ModLoaders.NEOFORGE, ModLoaders.FABRIC)
             }
         }
         // This is the default target.
