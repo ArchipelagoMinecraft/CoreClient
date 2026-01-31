@@ -1,4 +1,5 @@
 
+package io.github.archipelagominecraft.buildplugin
 const val ENSURE_VCS_VERSION_TASK_NAME: String = "ensureVCSVersion"
 
 object Keys {
@@ -15,18 +16,9 @@ object Keys {
     val minecraftVersion: String = dep("minecraft")
     val forgeVersion: String = dep("forge")
 
-    val mcpChannel: String = dep("mappings.channel")
-    val pluginType: String = dep("plugin_type")
+    val mcpChannel: String = dep("mcp.channel")
 }
 
-
-enum class PluginTypes(val propValue: String) {
-    RFG("retrofuturagradle"), // RetroFuturaGradle
-    MODSTITCH("modstitch");
-    companion object{
-        fun parse(string: String): PluginTypes = entries.firstOrNull { it.propValue == string } ?: throw IllegalArgumentException("Unknown plugin type: $string")
-    }
-}
 
 enum class ModLoaders(val propValue: String) {
     NONE_VANILLA("vanilla"),

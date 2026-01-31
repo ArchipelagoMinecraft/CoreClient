@@ -1,11 +1,11 @@
-package io.github.archipelagominecraft.plugin.configs
+package io.github.archipelagominecraft.buildplugin.configs
 
-import ModLoaders
 import dev.kikugie.fletching_table.FletchingTablePlugin
 import dev.kikugie.fletching_table.extension.FletchingTableExtension
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
-import io.archipelagominecraft.gradle.loader
-import io.archipelagominecraft.gradle.modInfo
+import io.github.archipelagominecraft.buildplugin.ModLoaders
+import io.github.archipelagominecraft.buildplugin.loader
+import io.github.archipelagominecraft.buildplugin.modInfo
 import org.cthing.gradle.plugins.buildconstants.BuildConstantsTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
@@ -15,14 +15,16 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 
 
 fun commonConfiguration(target: Project) {
-    target.pluginManager.apply {
-        apply("org.cthing.build-constants")
-    }
+
     val loader = target.loader
     configureStonecutter(target, loader)
     configureFletchingTable(target)
+    configureBuildConstants(target)
 
-    //todo use gradle providers for loader
+}
+
+private fun configureBuildConstants(target: Project) {
+    target.pluginManager.apply("org.cthing.build-constants")
     val modInfo = target.modInfo
     val generateBuildConstants = target.tasks.named<BuildConstantsTask>("generateBuildConstants") {
         classname.set(modInfo.packageName + "." + modInfo.name + "Constants")
@@ -36,7 +38,6 @@ fun commonConfiguration(target: Project) {
             .kotlin
             .srcDirs(generateBuildConstants)
     }
-
 }
 
 private fun configureStonecutter(target: Project, loader: ModLoaders) {

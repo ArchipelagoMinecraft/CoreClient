@@ -1,28 +1,68 @@
-package io.github.archipelagominecraft.plugin.configs
+package io.github.archipelagominecraft.buildplugin.configs
 
-import dev.isxander.modstitch.base.BasePlugin
 import dev.isxander.modstitch.base.extensions.ModstitchExtension
-import dev.isxander.modstitch.util.PlatformExtensionInfo
-import io.archipelagominecraft.gradle.modInfo
+import dev.isxander.modstitch.util.Platform
+import dev.kikugie.stonecutter.build.StonecutterBuildExtension
+import io.github.archipelagominecraft.buildplugin.ModLoaders
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
 
+data class SpecificPluginApplicationResult(
+    val modDependenciesConfiguration: Provider<Configuration>,
+)
+
+/**
+ * This file applies modstitch, and fixes RetroFuturaGradle a bit
+ */
+fun modLoaderConfiguration(
+    project: Project,
+    javaVersion: Provider<Int>,
+    loader: Provider<ModLoaders>,
+) {
+
+
+    val sc = project.extensions.getByType<StonecutterBuildExtension>()
+
+    val platform = when (loader.get()) {
+        ModLoaders.NEOFORGE -> Platform.MDG
+        ModLoaders.FORGE if sc.current.parsed <= "1.12.2" -> Platform.RFG
+        ModLoaders.FORGE -> Platform.MDGLegacy
+        ModLoaders.FABRIC -> Platform.LoomRemap
+        ModLoaders.NONE_VANILLA if sc.current.parsed <= "1.12.2" -> Platform.RFG
+        ModLoaders.NONE_VANILLA if sc.current.parsed <= "1.21" -> Platform.MDGLegacy
+        ModLoaders.NONE_VANILLA -> Platform.MDG
+    }
+
+    if (platform == Platform.RFG) {
+        reflectionsRFGFix()
+    }
+
+    project.extra["modstitch.platform"] = platform.friendlyName
+    project.pluginManager.apply("dev.isxander.modstitch.base")
+    modstitchConfiguration(project, javaVersion, loader.get() == ModLoaders.NONE_VANILLA)
+    if (platform == Platform.RFG) {
+        rfgStonecutterCompat(project)
+    }
+
+}
+
+
 // https://github.com/CleanroomMC/TemplateDevEnvKt/blob/master/build.gradle.kts
-fun retroFuturaGradleConfiguration(
+fun rfgStonecutterCompat(
     target: Project,
-){
-
-    reflectionsRFGFix()
-    // add RFG to modstitch
-    addRfgModstitch(target)
-
-    val mixinSourceSets = target.extensions.getByType<ModstitchExtension>().mixin.mixinSourceSets.map { it.sourceSetName.get() }
+) {
+    @Suppress("UnstableApiUsage")
+    val mixinSourceSets =
+        target.extensions.getByType<ModstitchExtension>().mixin.mixinSourceSets.map { it.sourceSetName.get() }
     val whitelistedSourceSets = listOf(
         SourceSet.MAIN_SOURCE_SET_NAME,
         SourceSet.TEST_SOURCE_SET_NAME,
@@ -48,37 +88,6 @@ fun retroFuturaGradleConfiguration(
     }
 }
 
-
-fun addRfgModstitch(target: Project) {
-    val platformPlugin = ModstitchBaseCommonImplRFG()
-    val unselectedPlatforms = BasePlugin.platforms.values
-//    target.platform = selectedPlatform
-
-    // apply the real plugin for the correct platform
-    platformPlugin.apply(target)
-
-    fun <T : Any> createDummyExtension(target: Project, extension: PlatformExtensionInfo<T>) {
-        // multiple platforms may use the same extension, so only create a dummy if it doesn't already exist
-        // the real platform is always applied first
-        val alreadyExists = target.extensions.extensionsSchema
-            .find { it.name == extension.name } != null
-
-        if (!alreadyExists) {
-            target.extensions.create(extension.api, extension.name, extension.dummyImpl)
-        }
-    }
-
-    // create dud extensions for all other platforms
-    // to generate type safety so even when the platform is not applied, the script can be compiled
-    unselectedPlatforms.forEach { unselectedPlatform ->
-        unselectedPlatform.platformExtensionInfo?.let {
-            createDummyExtension(target, it)
-        }
-    }
-
-
-}
-
 //todo hack https://github.com/GTNewHorizons/RetroFuturaGradle/issues/94
 private fun reflectionsRFGFix() {
 
@@ -101,5 +110,4 @@ private fun reflectionsRFGFix() {
                 "(HashUtils classloader=${hashUtilsClass.classLoader}, contextClassLoader=$cl)"
     }
 }
-
 

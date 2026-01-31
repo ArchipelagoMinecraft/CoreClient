@@ -2,6 +2,7 @@ package io.github.archipelagominecraft.core
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import com.mojang.serialization.DataResult
 import com.mojang.serialization.JsonOps
 import io.github.archipelagominecraft.core.api.ArchipelagoMinecraftCoreRegistration
 import io.github.archipelagominecraft.core.api.ArchipelagoSlot
@@ -181,15 +182,26 @@ internal object ArchipelagoMinecraftClientCore {
         val slotDatas = unserializedSlotData.mapValues { (_, value) ->
             val gsonParsed = Gson().fromJson(value, JsonElement::class.java)
             val decoded = handler.dataCodec.decode(JsonOps.INSTANCE, gsonParsed)
-            decoded.getOrThrow {
-                IllegalStateException("Failed to parse slot data for feature: ${handler.id}, error : $it")
-            }.first
+            decoded.getOrThrowCompat(false) { "Failed to parse slot data for feature: ${handler.id}, error : $it" }
+                .first
         }
         handler.prepareFeature(
             ArchipelagoRandomizationFeatureImpl(
                 slotDatas
             )
         )
+    }
+
+
+    @Suppress("unused")
+    fun <R> DataResult<R>.getOrThrowCompat(ignored: Boolean, throwFun: (errorMessage: String) -> String): R {
+//? if >1.12.2 {
+        return this.getOrThrow {
+            IllegalStateException(throwFun(it))
+        }
+//? } else {
+        /*return this.getOrThrow(ignored,{throwFun(it)})
+        *///? }
     }
 
     /**

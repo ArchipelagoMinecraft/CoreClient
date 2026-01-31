@@ -1,9 +1,5 @@
-package io.archipelagominecraft.gradle
+package io.github.archipelagominecraft.buildplugin
 
-import Keys
-import ModLoaders
-import PluginTypes
-import defaultProperties
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project

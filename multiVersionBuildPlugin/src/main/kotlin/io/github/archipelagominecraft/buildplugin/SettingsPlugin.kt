@@ -1,3 +1,5 @@
+
+package io.github.archipelagominecraft.buildplugin
 import dev.kikugie.stonecutter.settings.StonecutterSettingsExtension
 import dev.kikugie.stonecutter.settings.tree.TreeBuilder
 import org.danilopianini.gradle.git.hooks.GitHooksExtension

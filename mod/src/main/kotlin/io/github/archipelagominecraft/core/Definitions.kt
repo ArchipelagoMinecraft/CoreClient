@@ -54,7 +54,7 @@ internal abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
                 if (typesMap.containsKey(it)) {
                     DataResult.success(it)
                 } else {
-                    DataResult.error { "Unknown type: $it" }
+                    dataResultErrorCompat { "Unknown type: $it" }
                 }
             }) { it }.dispatchMap<H>({ it.type.id }) { b ->
                 @Suppress("UNCHECKED_CAST")
@@ -65,11 +65,29 @@ internal abstract class ArchipelagoHandler<T : ArchipelagoType<D>, D> {
                         { makeHandler(type, it) },
                         { it.data }
                     )
-                xmap
+                xmap.codecCompat()
             }
     }
 }
 
+private fun <R> dataResultErrorCompat(message: () -> String): DataResult<R> {
+    return DataResult.error(
+        message
+        //? if <= 1.12.2
+            //()
+    )
+}
+
+private fun <A> MapCodec<A>.codecCompat():
+//? <= 1.12.2
+        //Codec<A>
+//? > 1.12.2
+MapCodec<A>
+{
+    return this
+        //? <= 1.12.2
+        //.codec()
+}
 
 internal data class ArchipelagoItemHandler<T : ArchipelagoItemType<D>, D>(
     override val type: T,
@@ -124,7 +142,7 @@ private fun <T> Codec<String>.comapFlatMapID(constructor: (Int) -> T, getter: (T
     this.comapFlatMap({
         it.toIntOrNull()?.let {
             DataResult.success(constructor(it))
-        } ?: DataResult.error { "key '$it' is not an integer " }
+        } ?: dataResultErrorCompat { "key '$it' is not an integer " }
     }, {
         getter(it).toString()
     })

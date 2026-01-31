@@ -1,13 +1,15 @@
-import com.gtnewhorizons.retrofuturagradle.mcp.ReobfuscatedJar
-import io.archipelagominecraft.gradle.loader
-import io.archipelagominecraft.gradle.modInfo
-import io.github.archipelagominecraft.plugin.configs.retroFuturaGradle
+import io.github.archipelagominecraft.buildplugin.loader
+import io.github.archipelagominecraft.buildplugin.modInfo
 
+buildscript {
+    dependencies {
+        classpath("commons-io:commons-io:2.15.0")
+    }
+}
 plugins {
     kotlin("jvm")
     id("io.github.archipelagominecraft.build-multiversion-conventions")
-    id("backport-datafixerupper")
-    id("com.gradleup.shadow")
+    id("com.gradleup.shadow") version "9.3.1"
     `maven-publish`
 }
 
@@ -18,76 +20,46 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xnested-type-aliases")
     }
-    jvmToolchain(modstitch.javaVersion.get())
+    jvmToolchain {
+        languageVersion = modstitch.javaVersion.map {
+            JavaLanguageVersion.of(it)
+        }
+    }
 }
 
 val shade by configurations.registering
-configurations.implementation {
+
+configurations.modstitchImplementation {
     extendsFrom(shade.get())
 }
-val shadeDowngrade = if(backportDfu.shouldBackport) {
-    val shadeDowngrade = configurations.register("shadeDowngrade")
-    configurations.named("modstitchDowngradeImplementation") {
-        extendsFrom(shadeDowngrade.get())
-    }
-} else null
 
 dependencies {
     shade(kotlin("stdlib-jdk8"))
-    shade(project(":api:${modInfo.minecraftVersion}-vanilla"))
-
-    if (backportDfu.shouldBackport) {
-        backportDfu.dfuDependencies.forEach {
-            shadeDowngrade?.invoke(it)
-        }
+    modstitch.retrofuturagradle {
+        shade("com.mojang:datafixerupper:4.1.27")
     }
-    shade(project(":relocated-deps", configuration = "shadow"))
+    shade("io.github.archipelagomw:Java-Client:0.1.20") {
+        exclude("com.google.code.gson", "gson")
+        // todo figure out if forcing it to use minecraft's older gson ( on legacy versions) will cause issues
+
+    }
 }
 
 modstitch {
-    retroFuturaGradle {
-        if(backportDfu.shouldBackport){
-            enableJvmDowngrader = true
-            jvmDowngraderDowngradeJarTask {
-                inputFile.set(tasks.named("reobfJar", ReobfuscatedJar::class.java).flatMap { it.archiveFile })
-            }
-        }
-        tasks.named("reobfJar", ReobfuscatedJar::class.java) {
-            inputJar.set(tasks.shadowJar.flatMap { it.archiveFile })
-        }
+    retrofuturagradle {
         coreModClassName = "io.github.archipelagominecraft.core.loaders.legacyforge.LegacyForgeCorePlugin"
         hasModAndCoreMod = true
     }
 
-    val file = project.parent!!.file("accesstransformer.cfg")
+    val file = project.parent!!.file("widener.aw")
     @Suppress("OPT_IN_USAGE")
-    classTweaker.set(sc.process(file,"build/stonecutter_accesstransformer.cfg"))
+    classTweaker.set(sc.process(file, "build/stonecutter_widener.aw"))
 }
 
 val kotlinRelocateBase = "io.github.archipelagominecraft.core.shadow.kotlin"
 
-
-
 tasks.shadowJar {
-    configurations.set(emptyList())
-    configurations = listOf(shade.get()) + shadeDowngrade?.let{listOf(it.get())}.orEmpty()
-    if (backportDfu.shouldBackport) {
-        exclude("module-info.class")
-        exclude("META-INF/versions/**")
-        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
-    }
-    modstitch {
-        retroFuturaGradle {
-            dependencies {
-                // Because the "api" project depends on mixins, the shadow plugin would shade it if
-                // we didn't specify this
-                exclude {
-                    val full = it.moduleGroup + ":" + it.moduleName + ":" + it.moduleVersion
-                    this@retroFuturaGradle.mixinsDependencies.get().contains(full)
-                }
-            }
-        }
-    }
+    configurations = shade.map { setOf(it) }
     //todo figure out what to do about duplicate .kotlin_module files
     relocate("kotlin", "$kotlinRelocateBase.kotlin")
     relocate("org.jetbrains", "$kotlinRelocateBase.jetbrains")
@@ -101,16 +73,9 @@ publishing {
             url = uri("https://maven.pkg.github.com/ArchipelagoMinecraft/CoreClient")
             credentials {
                 username = ""
-                password = providers.gradleProperty("gpr.token").orElse(provider {
-                    throw IllegalStateException(
-                        "To get packages from github packages," +
-                                " a Personal Access Token (PAT) is required, even for public packages, please create one" +
-                                "and put it in \$GRADLE_USER_HOME/gradle.properties (NOT in the project's gradle.properties)"
-                    )
-                }).get()
+                password = providers.gradleProperty("gpr.token").orNull
             }
         }
-        mavenLocal()
     }
     publications {
         create<MavenPublication>("mod") {

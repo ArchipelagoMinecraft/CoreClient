@@ -1,4 +1,7 @@
 import dev.kikugie.stonecutter.controller.StonecutterControllerExtension
+import io.github.archipelagominecraft.buildplugin.ENSURE_VCS_VERSION_TASK_NAME
+import io.github.archipelagominecraft.buildplugin.EnsureVcsVersionTask
+import io.github.archipelagominecraft.buildplugin.ModLoaders
 import kotlinx.serialization.json.Json
 import org.jetbrains.gradle.ext.runConfigurations
 import org.jetbrains.gradle.ext.settings

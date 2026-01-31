@@ -2,7 +2,6 @@
 /*package io.github.archipelagominecraft.core.loaders.legacyforge
 
 
-import cpw.mods.fml.common.event.FMLConstructionEvent
 import io.github.archipelagominecraft.core.ArchipelagoClientConstants
 import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore
 import io.github.archipelagominecraft.core.ArchipelagoMinecraftClientCore.LOGGER
@@ -12,14 +11,15 @@ import io.github.archipelagominecraft.core.loaders.forgeLike.ForgeLikeEntrypoint
 typealias Mod = net.minecraftforge.fml.common.Mod
 typealias EventHandler = net.minecraftforge.fml.common.Mod.EventHandler
 typealias FMLPreInitializationEvent = net.minecraftforge.fml.common.event.FMLPreInitializationEvent
-typealias FMLServerAboutToStartEvent = net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent
+typealias FMLConstructionEvent = net.minecraftforge.fml.common.event.FMLConstructionEvent
 //? } else {
 
 /*typealias Mod = cpw.mods.fml.common.Mod
 typealias EventHandler = cpw.mods.fml.common.Mod.EventHandler
 
 typealias FMLPreInitializationEvent = cpw.mods.fml.common.event.FMLPreInitializationEvent
-typealias FMLServerAboutToStartEvent = cpw.mods.fml.common.event.FMLServerAboutToStartEvent
+typealias FMLConstructionEvent = cpw.mods.fml.common.event.FMLConstructionEvent
+
 *///? }
 
 @Mod(modid = ArchipelagoClientConstants.MOD_ID)

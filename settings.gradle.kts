@@ -1,3 +1,5 @@
+
+import io.github.archipelagominecraft.buildplugin.ModLoaders
 pluginManagement {
     includeBuild("multiVersionBuildPlugin")
     repositories {
@@ -7,11 +9,13 @@ pluginManagement {
         maven("https://maven.neoforged.net/releases")
         maven("https://maven.minecraftforge.net/")
         maven("https://maven.isxander.dev/releases/")
+        maven("https://jitpack.io")
         exclusiveContent {
             forRepositories(
                 maven("https://repo.spongepowered.org/maven")
             )
             filter {
+                @Suppress("UnstableApiUsage")
                 includeGroupAndSubgroups("org.spongepowered")
             }
         }
@@ -36,7 +40,6 @@ plugins {
 }
 
 
-val apiProject = ":api"
 val modProject = ":mod"
 
 val supportedVersions = listOf(
@@ -48,7 +51,6 @@ val supportedVersions = listOf(
 //    "1.21.7",
     "1.21.8"
 )
-include("relocated-deps")
 
 stonecutter {
     create(modProject) {
@@ -63,16 +65,6 @@ stonecutter {
         // This is the default target.
         // https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts
         vcsVersion = "1.21.8-neoforge"
-    }
-    create(apiProject) {
-        with(apmc) {
-            supportedVersions.forEach {
-                mc(it,ModLoaders.NONE_VANILLA)
-            }
-        }
-        // This is the default target.
-        // https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts
-        vcsVersion = "1.21.8-vanilla"
     }
 }
 

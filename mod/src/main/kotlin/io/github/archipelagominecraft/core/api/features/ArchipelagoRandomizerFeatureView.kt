@@ -1,7 +1,6 @@
 package io.github.archipelagominecraft.core.api.features
 
 import io.github.archipelagominecraft.core.api.ArchipelagoSlot
-import io.github.archipelagominecraft.core.api.compat.Player
 
 
 /**

@@ -1,11 +1,9 @@
-import dev.kikugie.stonecutter.settings.StonecutterSettingsExtension
+package io.github.archipelagominecraft.buildplugin
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.work.DisableCachingByDefault
 
 abstract class EnsureVcsVersionTask : DefaultTask(){
 
