@@ -3,7 +3,7 @@
 # certain platforms or Java versions, and provides a first line of defence
 # against bad commits.
 
-name: Build and test latest version or specified version
+name: Build and tests the specified version
 on:
   push: { }
   pull_request: { }
@@ -72,4 +72,4 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       - name: "Build and test ${{ matrix.version }}"
-        run: ./gradlew :${{ matrix.version }}:check
+        run: ./gradlew :mod:${{ matrix.version }}:check

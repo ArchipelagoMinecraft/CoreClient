@@ -23,6 +23,7 @@ fun commonConfiguration(target: Project) {
 
 }
 
+// generates a class with theses constants inside
 private fun configureBuildConstants(target: Project) {
     target.pluginManager.apply("org.cthing.build-constants")
     val modInfo = target.modInfo
@@ -40,6 +41,7 @@ private fun configureBuildConstants(target: Project) {
     }
 }
 
+// Specify stonecutterr constands and which resources files it should process
 private fun configureStonecutter(target: Project, loader: ModLoaders) {
     target.extensions.configure<StonecutterBuildExtension> {
         filters.include(

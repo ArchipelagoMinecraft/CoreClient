@@ -18,8 +18,9 @@ abstract class BuildMultiversionPlugin : Plugin<Project> {
         commonConfiguration(target)
 
         // Loads custom properties for the specific version
-// Everything should already be defined in VersionProperties.kt, but if some project needs to override something,
-// it should do so in versions/dependencies/<mcVersion>.properties
+        // Everything should already be defined in VersionProperties.kt,
+        // but if some project needs to override something,
+        // it should do so in versions/dependencies/<mcVersion>.properties
         target.extensions.configure<StonecutterBuildExtension> {
             loadSpecificDependencyVersions(
                 target, extension.versionPropertiesFolder
@@ -27,8 +28,7 @@ abstract class BuildMultiversionPlugin : Plugin<Project> {
             )
         }
 
-        val javaVersion = target.provider {target.modInfo.javaVersion}
-
+        val javaVersion = target.provider { target.modInfo.javaVersion }
         modLoaderConfiguration(
             target,
             javaVersion,

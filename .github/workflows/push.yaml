@@ -14,9 +14,16 @@ jobs:
   build_latest:
     name: "Build and test latest version"
     uses: ./.github/workflows/build-mod.yaml
+    with:
+      version: "1.21.8"
   build_1_12_2:
     name: "Build 1.12.2"
     uses: ./.github/workflows/build-mod.yaml
     with:
       version: "1.12.2"
+  build_1_7_10:
+    name: "Build 1.7.10"
+    uses: ./.github/workflows/build-mod.yaml
+    with:
+      version: "1.7.10"
 

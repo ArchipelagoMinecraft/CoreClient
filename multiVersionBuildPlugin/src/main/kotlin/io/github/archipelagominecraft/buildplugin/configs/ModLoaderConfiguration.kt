@@ -29,7 +29,6 @@ fun modLoaderConfiguration(
     loader: Provider<ModLoaders>,
 ) {
 
-
     val sc = project.extensions.getByType<StonecutterBuildExtension>()
 
     val platform = when (loader.get()) {
@@ -55,8 +54,9 @@ fun modLoaderConfiguration(
 
 }
 
-
-// https://github.com/CleanroomMC/TemplateDevEnvKt/blob/master/build.gradle.kts
+// RetroFuturaGradle adds new source sets for it's minecraft tasks, and they can trigger
+// task ordering errors with stonecutter, but they don't need stonecutter so we just disable
+// it for all source sets that are not the main source set or the mixins source set
 fun rfgStonecutterCompat(
     target: Project,
 ) {
@@ -89,6 +89,8 @@ fun rfgStonecutterCompat(
 }
 
 //todo hack https://github.com/GTNewHorizons/RetroFuturaGradle/issues/94
+// Just a hack, there's a ConcurrentModificationException sometimes with accessing a hashmap
+// so we use reflections to replace it with a ConcurrentHashMap
 private fun reflectionsRFGFix() {
 
     val cl = Thread.currentThread().contextClassLoader
