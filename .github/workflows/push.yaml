@@ -3,7 +3,7 @@
 # certain platforms or Java versions, and provides a first line of defence
 # against bad commits.
 
-name: Build and test latest version or specified version
+name: Build and test specified versions
 on:
   push: { }
   pull_request: { }
