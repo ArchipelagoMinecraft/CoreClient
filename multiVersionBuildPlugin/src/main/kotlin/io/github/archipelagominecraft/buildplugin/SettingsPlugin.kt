@@ -18,20 +18,19 @@ abstract class SettingsPlugin : Plugin<Settings> {
             apply("org.gradle.toolchains.foojay-resolver-convention")
         }
         settings.extensions.configure<GitHooksExtension> {
-            //todo find a cross-platform way
-//            preCommit {
-//                this@preCommit.from {
-//                    """
-//                ./gradlew -q $ENSURE_VCS_VERSION_TASK_NAME
-//                if [ $? -ne 0 ]; then
-//                    echo 'Stonecutter current version is not the VCS version!'
-//                    echo 'Please run the "Reset active project" gradle task before committing.'
-//                    exit 1
-//                fi
-//            """.trimIndent()
-//                }
-//            }
-//            createHooks(true)
+            preCommit {
+                this@preCommit.from {
+                    """
+                ./gradlew -q $ENSURE_VCS_VERSION_TASK_NAME 2>/dev/null
+                if [ $? -ne 0 ]; then
+                    echo 'Stonecutter current version is not the VCS version!'
+                    echo 'Please run the "Reset active project" gradle task before committing.'
+                    exit 1
+                fi
+            """.trimIndent()
+                }
+            }
+            createHooks(true)
         }
         val stonecutter = settings.extensions.getByType<StonecutterSettingsExtension>()
         stonecutter.apply {

@@ -56,7 +56,7 @@ dependencies{
     fun plugin(id: String, version: String) = "$id:$id.gradle.plugin:$version"
 //    implementation(plugin("dev.isxander.modstitch.base", "0.8.4"))
     // fork with RFG support
-    implementation("com.github.LelouBil.Modstitch:dev.isxander.modstitch.base.gradle.plugin:a4141ebb")
+    implementation("com.github.LelouBil.Modstitch:dev.isxander.modstitch.base.gradle.plugin:c32f1b31")
 
     implementation(plugin("com.google.devtools.ksp", "2.2.0-2.0.2"))
     implementation(plugin("dev.kikugie.fletching-table","0.1.0-alpha.22"))

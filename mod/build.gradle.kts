@@ -1,11 +1,6 @@
 import io.github.archipelagominecraft.buildplugin.loader
 import io.github.archipelagominecraft.buildplugin.modInfo
 
-buildscript {
-    dependencies {
-        classpath("commons-io:commons-io:2.15.0")
-    }
-}
 plugins {
     kotlin("jvm")
     id("io.github.archipelagominecraft.build-multiversion-conventions")

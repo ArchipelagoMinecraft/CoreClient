@@ -21,11 +21,9 @@ abstract class EnsureVcsVersionTask : DefaultTask(){
     fun run(){
 
         val currentVersion = currentVersion.get()
-        println("Current Version: $currentVersion")
         val vcsVersion = vcsVersion.get()
-        println("VCS Version: $vcsVersion")
         if (currentVersion != vcsVersion) {
-            throw GradleException("Current version is not the VCS version!")
+            throw GradleException("Current version ${currentVersion} is not the VCS version ${vcsVersion}!")
         }
     }
 }
