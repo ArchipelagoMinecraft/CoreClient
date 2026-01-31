@@ -27,6 +27,7 @@ kotlin {
     }
 }
 
+
 val shade by configurations.registering
 
 configurations.modstitchImplementation {
