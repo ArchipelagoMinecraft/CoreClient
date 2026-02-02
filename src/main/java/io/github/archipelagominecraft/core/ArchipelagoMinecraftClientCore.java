@@ -19,10 +19,10 @@ public class ArchipelagoMinecraftClientCore {
         LOGGER.info("Hello from ArchipelagoMinecraftClientCore!");
 
         //? if fabric {
-        /*CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             APConnectCmd.connectCommand(dispatcher);
         });
-        *///?}
+        //?}
 
     }
 

@@ -20,11 +20,11 @@ public abstract class ForceSeedMixin {
 
     @Inject(method = "seed", at = @At("HEAD"), cancellable = true)
     private void overrideChunkSeed(CallbackInfoReturnable<Long> cir) {
-        Long forcedSeed = SampleArchipelagoFeatureWorldSeedRando.INSTANCE.getForcedSeed();
-        if (forcedSeed != null) {
-            // access transformer test as well
-            this.seed = forcedSeed;
-        }
+//        Long forcedSeed = SampleArchipelagoFeatureWorldSeedRando.INSTANCE.getForcedSeed();
+//        if (forcedSeed != null) {
+//            // access transformer test as well
+//            this.seed = forcedSeed;
+//        }
     }
 }
 //? }

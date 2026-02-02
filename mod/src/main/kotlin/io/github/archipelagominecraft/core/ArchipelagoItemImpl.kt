@@ -8,7 +8,7 @@ import java.util.Collections
 @JvmInline
 value class APItemID(val value: Int)
 
-class ArchipelagoItemImpl(val id: APItemID, val client: ArchipelagoClient) : ArchipelagoItemView {
+class ArchipelagoItemImpl(val id: APItemID, val client: ArchipelagoContext) : ArchipelagoItemView {
 
     init {
         client.registerItemListener { id, slot ->

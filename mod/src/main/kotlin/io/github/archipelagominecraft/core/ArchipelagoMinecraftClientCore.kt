@@ -12,8 +12,16 @@ import io.github.archipelagominecraft.core.api.items.ArchipelagoItemType
 import io.github.archipelagominecraft.core.api.items.ArchipelagoItemView
 import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationType
 import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationView
+import io.github.archipelagominecraft.core.events.commands.APConnectCmd
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
+
+//? if fabric {
+/*import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+*///?} elif neoforge {
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.neoforge.event.RegisterCommandsEvent
+//?}
 
 //json5 to allow comments, Gson handles this
 const val DEFINITIONS_PATH = "../../../../definitions.json5"
@@ -29,11 +37,9 @@ internal object ArchipelagoMinecraftClientCore {
     @JvmField
     internal val LOGGER: Logger = LogManager.getLogger(ArchipelagoClientConstants.MOD_NAME)
 
-    internal var registration: ArchipelagoCoreRegistrationImpl? = null
+    internal var registration: ArchipelagoClientRegistrationImpl? = null
 
-    private val serverSlot: ArchipelagoSlot = object : ArchipelagoSlot {
-        override val isServerwideSlot: Boolean = true
-    }
+    private val serverSlot: ArchipelagoSlot = ArchipelagoSlotImpl(true)
 
     /**
      * Called as soon as possible, when the mod is initialized
@@ -41,18 +47,29 @@ internal object ArchipelagoMinecraftClientCore {
     @JvmStatic
     internal fun initialize() {
         LOGGER.info("Hello from ArchipelagoMinecraftClientCore!")
-        registration = ArchipelagoCoreRegistrationImpl(
+        registration = ArchipelagoClientRegistrationImpl(
             setOf(serverSlot),
             { emptySet() },
             { serverSlot }
         )
 
+        //? if fabric {
+        /*CommandRegistrationCallback.EVENT.register({ dispatcher, registryAccess, environment ->
+            APConnectCmd.connectCommand(dispatcher)
+        })
+        *///?}
 
         //todo for sample purposes, they should be in the "provider" mod
         ArchipelagoMinecraftCoreRegistration.registerItemType(SampleArchipelagoItemType)
         ArchipelagoMinecraftCoreRegistration.registerLocationType(SampleArchipelagoLocationType)
         ArchipelagoMinecraftCoreRegistration.registerRandomizerFeature(SampleArchipelagoFeatureWorldSeedRando)
     }
+
+    //? if neoforge {
+    @SubscribeEvent
+    fun onRegisterCommandsEvent(event: RegisterCommandsEvent) {
+        APConnectCmd.connectCommand(event.getDispatcher())
+    } //?}
 
     /**
      * Called after provider mods had a chance to register their types
@@ -94,7 +111,7 @@ internal object ArchipelagoMinecraftClientCore {
         LOGGER.info("Running with ${definitions.items.size} items and ${definitions.locations.size} locations.")
 
 
-        val client: ArchipelagoClient = object : ArchipelagoClient {
+        val client: ArchipelagoContext = object : ArchipelagoContext {
             override val managedSlots: Set<ArchipelagoSlot> = setOf(serverSlot)
 
             override fun isLocationCheckedForSlot(

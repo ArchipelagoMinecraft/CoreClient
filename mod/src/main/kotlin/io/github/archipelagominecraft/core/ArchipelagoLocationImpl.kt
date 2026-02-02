@@ -6,7 +6,7 @@ import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationView
 @JvmInline
 value class APLocationID(val value: Int)
 
-class ArchipelagoLocationImpl(val id: APLocationID, val client: ArchipelagoClient) : ArchipelagoLocationView {
+class ArchipelagoLocationImpl(val id: APLocationID, val client: ArchipelagoContext) : ArchipelagoLocationView {
     override fun checkFor(slots: List<ArchipelagoSlot>) =
         slots.forEach { client.markLocationAsCheckedForSlot(it, id) }
 

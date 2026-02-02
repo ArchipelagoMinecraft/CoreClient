@@ -34,7 +34,7 @@ dependencies {
     modstitch.retrofuturagradle {
         shade("com.mojang:datafixerupper:4.1.27")
     }
-    shade("io.github.archipelagomw:Java-Client:0.1.20") {
+    shade("io.github.archipelagomw:Java-Client:0.2.0") {
         exclude("com.google.code.gson", "gson")
         // todo figure out if forcing it to use minecraft's older gson ( on legacy versions) will cause issues
 

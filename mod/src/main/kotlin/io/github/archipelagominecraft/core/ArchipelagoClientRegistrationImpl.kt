@@ -7,7 +7,7 @@ import io.github.archipelagominecraft.core.api.features.ArchipelagoRandomizerFea
 import io.github.archipelagominecraft.core.api.items.ArchipelagoItemType
 import io.github.archipelagominecraft.core.api.locations.ArchipelagoLocationType
 
-internal class ArchipelagoCoreRegistrationImpl(
+internal class ArchipelagoClientRegistrationImpl(
     override val serverManagedSlots: Set<ArchipelagoSlot>,
     private val getOnlinePlayerForSlotFunc: (ArchipelagoSlot) -> Set<Player>,
     private val getSlotRepresentingPlayerFunc: (Player) -> ArchipelagoSlot
