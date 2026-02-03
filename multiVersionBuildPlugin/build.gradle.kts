@@ -39,19 +39,6 @@ gradlePlugin {
 }
 
 
-publishing {
-    repositories{
-        maven{
-            url = uri("https://maven.pkg.github.com/ArchipelagoMinecraft/CoreClient")
-            credentials {
-                username = ""
-                password = providers.gradleProperty("gpr.token").orNull
-            }
-        }
-    }
-}
-
-
 dependencies{
     fun plugin(id: String, version: String) = "$id:$id.gradle.plugin:$version"
 //    implementation(plugin("dev.isxander.modstitch.base", "0.8.4"))

@@ -76,8 +76,14 @@ publishing {
     publications {
         create<MavenPublication>("mod") {
             from(components["kotlin"])
-            groupId = "io.github.archipelagominecraft"
-            artifactId = "client-core-${modInfo.minecraftVersion}-${loader}"
+            groupId = project.group.toString()
+            artifactId = "client-core-${modInfo.minecraftVersion}-${loader.propValue}"
+            version = modInfo.version
+        }
+        create<MavenPublication>("shadow") {
+            from(components["shadow"])
+            groupId = project.group.toString()
+            artifactId = "client-core-${modInfo.minecraftVersion}-${loader.propValue}-all"
             version = modInfo.version
         }
     }
