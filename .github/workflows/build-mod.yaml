@@ -1,0 +1,75 @@
+# Automatically build the project and run any configured tests for every push
+# and submitted pull request. This can help catch issues that only occur on
+# certain platforms or Java versions, and provides a first line of defence
+# against bad commits.
+
+name: Build and tests the specified version
+on:
+  push: { }
+  pull_request: { }
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build and test"
+        required: false
+  workflow_call:
+    inputs:
+      version:
+        description: "Version to build and test"
+        required: false
+        type: string
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.version || 'latest' }}
+  cancel-in-progress: true
+
+jobs:
+  discover-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.list_versions.outputs.versions }}
+    steps:
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v3.2.0
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Setup Java"
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+      - name: "Setup Gradle"
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      - id: list_versions
+        name: "List stonecutter versions"
+        run: |
+          VERSIONS=$(./gradlew --no-daemon --parallel -q printVersions | grep -A 2 VERSIONS | tail -n 1)
+          if [ "${{ inputs.version }}" = "" ]; then
+            echo "versions=$(echo $VERSIONS | jq -c '.[-3:]')" >> $GITHUB_OUTPUT
+          else
+            echo "versions=$(echo $VERSIONS | jq -c '[.[] | select(contains ("${{ inputs.version }}"))]')" >> $GITHUB_OUTPUT
+          fi
+  build_test:
+    runs-on: ubuntu-latest
+    needs: discover-versions
+    name: "Build and test ${{ matrix.version }}"
+    strategy:
+      matrix:
+        version: ${{ fromJson(needs.discover-versions.outputs.versions) }}
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+      - name: "Setup Java"
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+      - name: "Setup Gradle"
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      - name: "Build and test ${{ matrix.version }}"
+        run: ./gradlew :mod:${{ matrix.version }}:check

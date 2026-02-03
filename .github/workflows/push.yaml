@@ -1,0 +1,29 @@
+# Automatically build the project and run any configured tests for every push
+# and submitted pull request. This can help catch issues that only occur on
+# certain platforms or Java versions, and provides a first line of defence
+# against bad commits.
+
+name: Build and test specified versions
+on:
+  push: { }
+  pull_request: { }
+
+
+
+jobs:
+  build_latest:
+    name: "Build and test latest version"
+    uses: ./.github/workflows/build-mod.yaml
+    with:
+      version: "1.21.8"
+  build_1_12_2:
+    name: "Build 1.12.2"
+    uses: ./.github/workflows/build-mod.yaml
+    with:
+      version: "1.12.2"
+  build_1_7_10:
+    name: "Build 1.7.10"
+    uses: ./.github/workflows/build-mod.yaml
+    with:
+      version: "1.7.10"
+

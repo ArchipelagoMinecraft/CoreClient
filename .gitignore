@@ -3,11 +3,13 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-!versions/dependencies/**
 versions/**
+!versions/**/*.properties
 
 ### Minecraft ###
 run
+runClient
+runServer
 
 ### IntelliJ IDEA ###
 .idea

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "compatibilityLevel": "${mixin_compat_level}",
+  "package": "io.github.archipelagominecraft.core.mixins",
+  "mixins": [
+    //? if <=1.12.2 {
+    /*"ForceSeedMixinLegacy"
+    *///?} else {
+    "ForceSeedMixin"
+    //?}
+  ]
+}

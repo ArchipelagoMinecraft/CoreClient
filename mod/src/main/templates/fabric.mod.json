@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "name": "${mod_name}",
+  "authors": ${mod_authors_json_list},
+  "version": "${mod_version}",
+  "description": "${mod_description}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "${mod_package}.loaders.fabric.FabricEntrypoint"
+    ]
+  },
+  "mixins": [
+    "${mixins_file_prefix}.mixins.json"
+  ]
+}
